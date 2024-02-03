@@ -5,27 +5,29 @@ import (
 	"math"
 )
 
-// Point represents a point in 2D space
-type Point struct {
-	X, Y float64
-}
-
 // VoronoiCell represents a Voronoi cell
 type VoronoiCell struct {
 	Center Point
 }
 
+// Point represents a point in 2D space with integer coordinates
+type Point struct {
+	X, Y int
+}
 
 // JumpFlood performs the Jump Flood algorithm to compute Voronoi diagram
-func JumpFlood(points []Point, size int) [][]VoronoiCell {
+func JumpFlood(matrix [][]int, size int) [][]VoronoiCell {
 	grid := make([][]VoronoiCell, size)
 	for i := range grid {
 		grid[i] = make([]VoronoiCell, size)
 	}
 
-	for _, point := range points {
-		x, y := int(point.X), int(point.Y)
-		grid[x][y] = VoronoiCell{Center: point}
+	for x := 0; x < size; x++ {
+		for y := 0; y < size; y++ {
+			if matrix[x][y] > 0 {
+				grid[x][y] = VoronoiCell{Center: Point{X: x, Y: y}}
+			}
+		}
 	}
 
 	step := size / 2
@@ -69,20 +71,27 @@ func JumpFlood(points []Point, size int) [][]VoronoiCell {
 
 func main() {
 	// Example usage
-	points := []Point{
-		{2, 2},
-		{8, 8},
-		{5, 5},
+	matrix := [][]int{
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	}
 
-	size := 16
-	voronoiGrid := JumpFlood(points, size)
+	size := len(matrix)
+	voronoiGrid := JumpFlood(matrix, size)
 
 	// Display the Voronoi cells
 	for _, row := range voronoiGrid {
 		for _, cell := range row {
 			if cell.Center != (Point{}) {
-				fmt.Printf("(%0.2f, %0.2f) ", cell.Center.X, cell.Center.Y)
+				fmt.Printf("(%d, %d) ", cell.Center.X, cell.Center.Y)
 			} else {
 				fmt.Print("( - , - ) ")
 			}
