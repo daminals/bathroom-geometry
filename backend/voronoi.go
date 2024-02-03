@@ -3,7 +3,7 @@ package main
 import (
 	"fmt" 
 	"container/heap"
-	"sync"
+	// "sync"
 	"sort"
 	"math/rand"
 	"math"
@@ -123,33 +123,62 @@ func top3Voronoi(voronoiPoints []Point, point Point) []Point {
 	return voronoiPoints[:3]
 }
 
-// create some sample points that are generally close to the voronoi points
-func createInitSamplePoints(voronoiPoints []Point, numSamplePoints int) []Point {
+// create some sample points
+func createInitSamplePoints(voronoiPoints []Point, numSamplePoints int, size int) []Point {
 	// initialize sample points
-	samplePoints := make([]Point, numSamplePoints)
+	samplePoints := make([]Point, 0)
+	maxTries := numSamplePoints*2;
+	tries := 0
 
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-
-	for i := 0; i < numSamplePoints; i += 1 {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
+	// this loop will create a number of sample points which are close to the voronoi points
+	for maxTries > tries {
+			tries += 1
 
 			// pick a random voronoi point
 			voronoiPoint := voronoiPoints[rand.Intn(len(voronoiPoints))]
 			// add some random noise to the point
-			samplePoints[i] = Point{voronoiPoint.x + rand.Intn(3), voronoiPoint.y + rand.Intn(3)}
+			samplePoint := Point{voronoiPoint.x + rand.Intn(3), voronoiPoint.y + rand.Intn(3)}
 
-			// protect concurrent access to samplePoints
-			mu.Lock()
-			defer mu.Unlock()
-		}(i)
+			// check if within bounds
+			if samplePoint.x < 0 || samplePoint.x >= size || samplePoint.y < 0 || samplePoint.y >= size {
+				continue
+			}
+
+			// check if the sample point is already in the list
+			for _, point := range samplePoints {
+				if samplePoint == point {
+					continue
+				}
+			}
+
+			samplePoints = append(samplePoints, samplePoint)
+		}
+	
+  // generate some sample points which are generally far from voronoi points
+	tries = 0
+	maxTries = numSamplePoints/2;
+	for maxTries > tries {
+		tries += 1
+		samplePoint := Point{rand.Intn(size), rand.Intn(size)}
+
+		// check if within bounds
+		if samplePoint.x < 0 || samplePoint.x >= size || samplePoint.y < 0 || samplePoint.y >= size {
+			continue
+		}
+
+		// check if the sample point is already in the list
+		for _, point := range samplePoints {
+			if samplePoint == point {
+				continue
+			}
+		}
+
+		samplePoints = append(samplePoints, samplePoint)
 	}
 
-	wg.Wait()
 	return samplePoints
 }
+
 
 // create a voronoi table data structure which maps an ID to a point value
 func createVoronoiTable(voronoiPoints []Point) map[int]Point {
@@ -171,17 +200,72 @@ func getVoronoiId(voronoiTable map[int]Point, point Point) int {
 	return -1
 }
 
-// func medianNeighborVornoiID(matrix [][]int, point Point) int {
-// 	// get the color of the points neighbors
-// 	neighbors := getNeighbors(point, matrix)
-// 	return 1
-// }
+func medianNeighborVornoiID(matrix [][]int, colorMatrix [][]int, point Point) int {
+	// get the color of the points neighbors
+	neighbors := getNeighbors(point, matrix)
+	// make a map of the colors of the neighbors with their frequency
+	neighborColors := make(map[int]int)
+	for _, neighbor := range neighbors {
+		neighborColor := colorMatrix[neighbor.x][neighbor.y]
+		neighborColors[neighborColor] += 1
+	}
+	// check how many of the neighbors have the same color
+	// if the majority of the neighbors have the same color, return that color
+	// otherwise, return -1
+	if len(neighborColors) == 0 {
+		return -1
+	}
+
+	maxColor := -1
+	maxCount := 0
+	// loop through the neighbor colors and find the most frequent color
+	for color, count := range neighborColors {
+		if count > maxCount {
+			maxCount = count
+			maxColor = color
+		}
+	}
+	// if the most frequent color is the majority, return that color
+	if maxCount > len(neighbors) / 2 {	
+		return maxColor
+	}
+	// otherwise, return -1
+	return -1
+}
+
+func calculateNearestVoronoiID(matrix [][]int, voronoiPoints []Point, voronoiTable map[int]Point, point Point) int {
+	minDistance := MaxInt
+	voronoiId := -1
+	for _, voronoiPoint := range top3Voronoi(voronoiPoints, point) {
+		// calculate distance from sample point to voronoi point
+		distance := distance(matrix, point, voronoiPoint)
+		// update matrix with voronoi point id
+		if distance < minDistance {
+			minDistance = distance
+			voronoiId = getVoronoiId(voronoiTable, voronoiPoint)
+		}
+	}
+	return voronoiId
+}
 
 
-func voronoi(matrix [][]int, voronoiPoints []Point, size int) {
+func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 	// create initial sample points
-	samplePoints := createInitSamplePoints(voronoiPoints, size / 5)
-	filled_points := 0
+	samplePoints := createInitSamplePoints(voronoiPoints, size / 5, size)
+	filledPoints := 0
+	filledPointList := make([]Point, size*size)
+
+	// add voronoi points to filledPointList
+	for _, point := range voronoiPoints {
+		filledPointList[filledPoints] = point
+		filledPoints += 1
+	}
+
+	// add sample points to filledPointList
+	for _, point := range samplePoints {
+		filledPointList[filledPoints] = point
+		filledPoints += 1
+	}
 
 	// create output matrix
 	outputMatrix := make([][]int, size)
@@ -191,32 +275,48 @@ func voronoi(matrix [][]int, voronoiPoints []Point, size int) {
 
 	voronoiTable := createVoronoiTable(voronoiPoints)
 
-	// calculate distance from each sample point to each voronoi point
+	// calculate distance from each sample point to some voronoi points
 	for _, point := range samplePoints {
-		minDistance := MaxInt
-		voronoiId := -1
-		for _, voronoiPoint := range top3Voronoi(voronoiPoints, point) {
-			// calculate distance from sample point to voronoi point
-			distance := distance(matrix, point, voronoiPoint)
-			// update matrix with voronoi point id
-			if distance < minDistance {
-				minDistance = distance
-				voronoiId = getVoronoiId(voronoiTable, voronoiPoint)
-			}
-		}
+		voronoiId := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, point)
 		// update output matrix with voronoi id
 		outputMatrix[point.x][point.y] = voronoiId
-		filled_points += 1
 	}
 
-	for filled_points < size*size { 
+	for filledPoints < size*size { 
+		// get filled point
+		filledPoint := filledPointList[rand.Intn(filledPoints)]
+		// find a point that is near to already filled point
+		samplePoint := Point{filledPoint.x + rand.Intn(4), filledPoint.y + rand.Intn(3)}
 
+		// check if within bounds
+		if samplePoint.x < 0 || samplePoint.x >= size || samplePoint.y < 0 || samplePoint.y >= size {
+			continue
+		}
 
+		// check if the sample point is already in the list
+		for _, point := range samplePoints {
+			if samplePoint == point {
+				continue
+			}
+		}
+
+		// calculate median neighbor voronoi id
+		medianNeighborVornoiID := medianNeighborVornoiID(matrix, outputMatrix, samplePoint)
+		if medianNeighborVornoiID != -1 {
+			outputMatrix[samplePoint.x][samplePoint.y] = medianNeighborVornoiID
+			filledPointList[filledPoints] = samplePoint
+			filledPoints += 1
+		} else {
+			// calculate distance to near voronoi point
+			voronoiId := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, samplePoint)
+			// update output matrix with voronoi id
+			outputMatrix[samplePoint.x][samplePoint.y] = voronoiId
+			filledPointList[filledPoints] = samplePoint
+			filledPoints += 1
+		}
 	}
-
+	return outputMatrix
 }
-
-
 
 // func jumpFlood(matrix [][]int, voronoiPoints [][]int, size int) {
 // 	step = size / 2
