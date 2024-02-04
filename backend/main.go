@@ -4,10 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-
+	"net/http" 
+	"os"
+	"math/rand"
+	"time"
 	// "voronoi"
 )
+
+const bathroomsDB = "bathroomsDB.json"
 
 // VoronoiRequest represents the JSON input structure.
 type VoronoiRequest struct {
@@ -58,10 +62,173 @@ func voronoiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
-type BathroomMap struct{ 
-	ID int64 `json:"id omitempty"`  
-	Name string `json:"name"`
+// Bathroom represents the bathroom details.
+type Bathroom struct {
+	ID               int    `json:"id"`
+	Name             string `json:"name"`
+	Gender           string `json:"gender"`
+	Accessible       bool   `json:"accessible"`
+	MenstrualProduct bool   `json:"menstrualProducts"`
 }
+
+// Coordinates represents the latitude and longitude of a location.
+type Coordinates struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
+// BathroomMap represents the main structure for unmarshaling the JSON.
+type BathroomMap struct {
+	Name        string       `json:"name"`
+	Coordinates []Coordinates `json:"coordinates"`
+	Grid        [][]int       `json:"grid"`
+	Bathrooms   []Bathroom    `json:"bathrooms"` 
+}
+
+type BathroomMapOutput struct {
+	Name        string       `json:"name"`
+	Coordinates []Coordinates `json:"coordinates"`
+	Grid        [][]int       `json:"grid"`
+	Bathrooms   []Bathroom    `json:"bathrooms"` 
+	ID 					int 					`json:"ID"`
+}
+
+func generateUniqueID() int {
+	// Seed the random number generator with the current time
+	rand.Seed(time.Now().UnixNano())
+
+	// Generate a random 9-digit integer ID
+	id := rand.Intn(900000000) + 100000000
+
+	return id
+}
+
+func ConvertBathroomMapToOutput(bathroomMap BathroomMap) BathroomMapOutput {
+	bathroomMapOutput := BathroomMapOutput{
+		Name: bathroomMap.Name,
+		ID: generateUniqueID(),
+		Coordinates: bathroomMap.Coordinates,
+		Grid: bathroomMap.Grid,
+		Bathrooms: bathroomMap.Bathrooms,
+	}
+	return bathroomMapOutput
+}
+
+func bathroomWriteHandler(w http.ResponseWriter, r *http.Request) {
+	// Only allow POST requests
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Decode JSON request
+	var bathroomMap BathroomMap
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&bathroomMap); err != nil {
+		http.Error(w, "Invalid JSON input", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	bathroomMapOutput := ConvertBathroomMapToOutput(bathroomMap)
+
+	// Write the bathroomMap to the file
+	if err := writeBathroomMapToFile(bathroomMapOutput); err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// turn bathroomMap back into JSON
+	jsonResponse, err := json.Marshal(bathroomMapOutput)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return 
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResponse)
+}
+
+// write a new bathroom map to the file
+func writeBathroomMapToFile(bathroomMap BathroomMapOutput) error {
+	// Read existing data from file
+	file, err := os.ReadFile(bathroomsDB)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+	// Unmarshal the JSON data into a slice of BathroomMap objects
+	var bathroomMaps []BathroomMapOutput
+	err = json.Unmarshal(file, &bathroomMaps)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+
+	// Append the new bathroomMap to the JSON
+	bathroomMaps = append(bathroomMaps, bathroomMap)
+
+	// Convert the bathroomMaps to JSON
+	jsonData, err := json.Marshal(bathroomMaps)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+
+	// Print the parsed data
+	fmt.Printf("Name: %s\n", bathroomMap.Name)
+	fmt.Println("ID:", bathroomMap.ID)
+	fmt.Println("Coordinates:")
+	for _, coord := range bathroomMap.Coordinates {
+		fmt.Printf("Lat: %f, Lng: %f\n", coord.Lat, coord.Lng)
+	}
+
+	fmt.Println("Grid:")
+	for _, row := range bathroomMap.Grid {
+		fmt.Println(row)
+	}
+
+	fmt.Println("Bathrooms:")
+	for _, bath := range bathroomMap.Bathrooms {
+		fmt.Printf("ID: %d, Name: %s, Gender: %s, Accessible: %t, MenstrualProduct: %t\n",
+			bath.ID, bath.Name, bath.Gender, bath.Accessible, bath.MenstrualProduct)
+	}
+
+	// Write the new JSON to the file
+	err = os.WriteFile(bathroomsDB, jsonData, 0644)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+
+	return nil
+}
+
+type BathroomGet struct {
+	Name string `json:"name"`
+	ID int `json:"id"`
+}
+
+// // Get BathroomMaps from the file
+// func getBathroomMapsFromFile() ([]BathroomMap, error) {
+// 	// Read existing data from file
+// 	file, err := os.ReadFile(bathroomsDB)
+// 	if err != nil {
+// 		fmt.Println("Error:", err)
+// 		return nil, err
+// 	}
+// 	// Unmarshal the JSON data into a slice of BathroomMap objects
+// 	var bathroomMaps []BathroomMap
+// 	err = json.Unmarshal(file, &bathroomMaps)
+// 	if err != nil {
+// 		fmt.Println("Error:", err)
+// 		return nil, err
+// 	}
+// 	// transform the data into an array of 
+
+// }
+
 
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -72,5 +239,12 @@ func main() {
 	http.HandleFunc("/", handler)
 	// Define the endpoint and handler function
 	http.HandleFunc("/api/voronoi", voronoiHandler)
+	http.HandleFunc("/api/bathroom/write", bathroomWriteHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
+
+
+	// bathroomdata := BathroomMap{
+	// 	ID: [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}},
+	// }
+
 }
