@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { PUBLIC_MAPS_KEY } from '$env/static/public';
 	import { onMount } from 'svelte';
 	import { type Bathroom } from '$lib/types';
 	import EditBathroom from '$lib/editor/EditBathroom.svelte';
 	import { Input, Button } from 'flowbite-svelte';
 	import { SearchOutline } from 'flowbite-svelte-icons';
+	import { PUBLIC_API_ADDRESS } from '$env/static/public';
 
 	let container: HTMLDivElement;
 	let map: google.maps.Map;
@@ -106,7 +106,7 @@
 		mode = 'Draw';
 		let bounds = rect.getBounds();
 		if (bounds) {
-			// Calculate number of recetagles (10 meters = 1 recentagle)
+			// Calculate number of rectangles (5 meters = 1 recentagle)
 			let distanceX = google.maps.geometry.spherical.computeDistanceBetween(
 				new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
 				new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng())
@@ -115,8 +115,8 @@
 				new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
 				new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getNorthEast().lng())
 			);
-			let xCount = Math.ceil(distanceX / 10);
-			let yCount = Math.ceil(distanceY / 10);
+			let xCount = Math.ceil(distanceX / 5);
+			let yCount = Math.ceil(distanceY / 5);
 
 			// Draw grid within the rectangle
 			const north = bounds.getNorthEast().lat();
@@ -146,7 +146,7 @@
 							west: west + j * lngStep
 						},
 						fillColor: 'white',
-						fillOpacity: 0.1,
+						fillOpacity: 0.0,
 						strokeWeight: 1
 					});
 					rectangle.addListener('click', () => {
@@ -203,7 +203,10 @@
 				const marker = new google.maps.Marker({
 					position: center,
 					map,
-					label: id.toString()
+					label: {
+						text: id.toString(),
+						color: 'white'
+					}
 				});
 				markers.set(id, marker);
 			}
@@ -217,7 +220,7 @@
 			// Unfill the rectangle
 			rectangle.setOptions({
 				fillColor: 'white',
-				fillOpacity: 0.1
+				fillOpacity: 0.0
 			});
 			grid[y][x] = 0;
 		} else {
@@ -231,7 +234,7 @@
 	}
 
 	// Handle save button click
-	function handleSave() {
+	async function handleSave() {
 		// Convert the data to JSON
 		const data = {
 			name: mapName,
@@ -244,20 +247,17 @@
 		};
 
 		const json = JSON.stringify(data);
-		console.log(json);
+		const res = await fetch(`${PUBLIC_API_ADDRESS}/bathroom/write`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: json
+		});
 	}
 </script>
 
-<svelte:head>
-	<script
-		defer
-		async
-		src="https://maps.googleapis.com/maps/api/js?key={PUBLIC_MAPS_KEY}&libraries=places"
-	>
-	</script>
-</svelte:head>
-
-<div class="h-screen w-screen flex flex-col">
+<div class="h-full w-screen flex flex-col">
 	<div class="flex justify-between p-2 bg-primary-800">
 		<form on:submit={handleSubmit}>
 			<Input type="text" placeholder="Search for a place">

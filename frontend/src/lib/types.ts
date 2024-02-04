@@ -4,4 +4,5 @@ export type Bathroom = {
     gender: 'M' | 'F' | 'U';
     accessible: boolean;
     menstrualProducts: boolean; 
+    color?: string;
 };

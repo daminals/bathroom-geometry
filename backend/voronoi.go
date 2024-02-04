@@ -140,8 +140,12 @@ func top3Voronoi(voronoiPoints []Point, point Point) []Point {
 	return voronoiPoints
 }
 
+func checkWithinBounds(point Point, sizeX, sizeY int) bool {
+	return point.x < 0 || point.x >= sizeX || point.y < 0 || point.y >= sizeY
+}
+
 // create some sample points
-func createInitSamplePoints(voronoiPoints []Point, numSamplePoints int, size int) []Point {
+func createInitSamplePoints(voronoiPoints []Point, numSamplePoints, sizeX, sizeY int) []Point {
 	// initialize sample points
 	samplePoints := make([]Point, 0)
 	maxTries := numSamplePoints*2;
@@ -157,7 +161,7 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints int, size int
 			samplePoint := Point{voronoiPoint.x + rand.Intn(3)+1, voronoiPoint.y + rand.Intn(3)+1}
 
 			// check if within bounds
-			if samplePoint.x < 0 || samplePoint.x >= size || samplePoint.y < 0 || samplePoint.y >= size {
+			if checkWithinBounds(samplePoint, sizeX, sizeY) {
 				continue
 			}
 
@@ -185,10 +189,10 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints int, size int
 	maxTries = numSamplePoints;
 	for maxTries > tries {
 		tries += 1
-		samplePoint := Point{rand.Intn(size-1)+1, rand.Intn(size-1)+1}
+		samplePoint := Point{rand.Intn(sizeX-1)+1, rand.Intn(sizeY-1)+1}
 
 		// check if within bounds
-		if samplePoint.x < 0 || samplePoint.x >= size || samplePoint.y < 0 || samplePoint.y >= size {
+		if checkWithinBounds(samplePoint, sizeX, sizeY) {
 			continue
 		}
 
@@ -299,19 +303,24 @@ func calculateNearestVoronoiID(matrix [][]int, voronoiPoints []Point, voronoiTab
 }
 
 
-func Voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
+func Voronoi(matrix [][]int, voronoiPoints []Point) [][]int {
+
+	// get sizeX
+	sizeX := len(matrix)
+	// get sizeY
+	sizeY := len(matrix[0])
 	
 	// create output matrix
-	outputMatrix := make([][]int, size)
+	outputMatrix := make([][]int, sizeX)
 	for i := range outputMatrix {
-		outputMatrix[i] = make([]int, size)
+		outputMatrix[i] = make([]int, sizeY)
 	}
 	
 	// create initial sample points
-	samplePoints := createInitSamplePoints(voronoiPoints, size*5, size)
+	samplePoints := createInitSamplePoints(voronoiPoints, sizeX*5, sizeX, sizeY)
 	// fmt.Println(samplePoints)
 	filledPoints := 0
-	filledPointList := make([]Point, size*size)
+	filledPointList := make([]Point, sizeX*sizeY)
 
 	// add voronoi points to filledPointList
 	for _, point := range voronoiPoints {
@@ -337,8 +346,8 @@ func Voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 	}
 
 
-	for x := 0; x < size; x += 1 {
-		for y := 0; y < size; y += 1 {
+	for x := 0; x < sizeX; x += 1 {
+		for y := 0; y < sizeY; y += 1 {
 		checkPoint := Point{x, y}
 		// check if the sample point is already in the list
 		breakFlag := false
@@ -363,7 +372,7 @@ func Voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 				voronoiId := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, checkPoint)
 				// update output matrix with voronoi id
 				outputMatrix[checkPoint.x][checkPoint.y] = voronoiId
-				if (filledPoints == size*size) {
+				if (filledPoints == sizeX*sizeY) {
 					fmt.Println("Filled all points")
 					fmt.Println(filledPointList)
 					break;
@@ -387,11 +396,16 @@ func Voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 	return outputMatrix
 }
 
-func FindBathrooms(matrix [][]int, size int) ([]VoronoiPoint, []Point) {
+func FindBathrooms(matrix [][]int) ([]VoronoiPoint, []Point) {
+	// get size x
+	sizeX := len(matrix)
+	// get size y
+	sizeY := len(matrix[0])
+
 	bathrooms := make([]VoronoiPoint, 0)
 	bathroomPoints := make([]Point, 0)
-	for x := 0; x < size; x += 1 {
-		for y := 0; y < size; y += 1 {
+	for x := 0; x < sizeX; x += 1 {
+		for y := 0; y < sizeY; y += 1 {
 			if matrix[x][y] > 0 {
 				bathroomPoint := Point{x, y}
 				bathroomPoints = append(bathroomPoints, bathroomPoint)
