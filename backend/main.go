@@ -237,26 +237,67 @@ type BathroomGet struct {
 	Name string `json:"name"`
 	ID int `json:"ID"`
 }
+//Converts BathroomMapOutput to BathroomGet
+func ConvertOutputToGet(bathroomMap BathroomMapOutput) BathroomGet {
+    bathroomGet := BathroomGet{
+        Name: bathroomMap.Name,
+        ID: bathroomMap.ID,
+    }
+    return bathroomGet
+}
+// Get BathroomMaps from the file
+func getBathroomMapsFromFile() ([]BathroomGet, error) {
+    // Read existing data from file
+    file, err := os.ReadFile(bathroomsDB)
+    if err != nil {
+        fmt.Println("Error:", err)
+        return nil, err
+    }
+    // Unmarshal the JSON data into a slice of BathroomMap objects
+    var bathroomOutputs []BathroomMapOutput
+    err = json.Unmarshal(file, &bathroomOutputs)
+    if err != nil {
+        fmt.Println("Error:", err)
+        return nil, err
+    }
+    // transform the data into an array of BathroomGet Structs   
+    var bathroomGets [] BathroomGet 
+    for _, maps := range bathroomOutputs{ 
+        bathroomGets = append(bathroomGets, ConvertOutputToGet(maps))
+    } 
+    return bathroomGets, err; 
+}
+//bathroom maps by both name and ID 
+func bathroomGetMaps(w http.ResponseWriter, r *http.Request){ 
+	//Allow only request 
+	if r.Method != http.MethodGet { 
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	} 
+	// Decode JSON request
+	var bathroomGet BathroomGet
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&bathroomGet); err != nil {
+		http.Error(w, "Invalid JSON input", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close() 
 
-// // Get BathroomMaps from the file
-// func getBathroomMapsFromFile() ([]BathroomMap, error) {
-// 	// Read existing data from file
-// 	file, err := os.ReadFile(bathroomsDB)
-// 	if err != nil {
-// 		fmt.Println("Error:", err)
-// 		return nil, err
-// 	}
-// 	// Unmarshal the JSON data into a slice of BathroomMap objects
-// 	var bathroomMaps []BathroomMap
-// 	err = json.Unmarshal(file, &bathroomMaps)
-// 	if err != nil {
-// 		fmt.Println("Error:", err)
-// 		return nil, err
-// 	}
-// 	// transform the data into an array of 
+	bathroomMaps, err := getBathroomMapsFromFile()
+	if err!= nil { 
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	} 
+	jsonResponse, err := json.Marshal(bathroomMaps)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return 
+	}
 
-// }
-
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResponse)
+} 
 
 type BathroomID struct {
 	ID int `json:"ID"`
@@ -332,7 +373,8 @@ func main() {
 	// Define the endpoint and handler function
 	http.HandleFunc("/api/voronoi", voronoiHandler)
 	http.HandleFunc("/api/bathroom/write", bathroomWriteHandler)
-	http.HandleFunc("/api/bathroom/get/id", bathroomGetByIDHandler)
+	http.HandleFunc("/api/bathroom/get/id", bathroomGetByIDHandler) 
+	http.HandleFunc("/api/bathroom/get/Maps", bathroomGetMaps)
 
 	// Specify the directory containing the files
 	dir := "./images/"
