@@ -13,7 +13,6 @@ import (
 )
 
 const bathroomsDB = "bathroomsDB.json"
-const bathroomObjectDB = "bathroomObjectDB.json"
 
 // VoronoiRequest represents the JSON input structure.
 type VoronoiRequest struct {
@@ -115,101 +114,6 @@ func ConvertBathroomMapToOutput(bathroomMap BathroomMap) BathroomMapOutput {
 	}
 	return bathroomMapOutput
 }
-
-func ConvertBathroomObjectToOutput(bathroomObject bathroomObjectNoID) Bathroom {
-	bathroomObjectOutput := Bathroom{
-		// ID               int    `json:"id"`
-		// Name             string `json:"name"`
-		// Gender           string `json:"gender"`
-		// Accessible       bool   `json:"accessible"`
-		// MenstrualProduct bool   `json:"menstrualProducts"`
-		ID: generateUniqueID(),
-		Name: bathroomObject.Name,
-		Gender: bathroomObject.Gender,
-		Accessible: bathroomObject.Accessible,
-		MenstrualProduct: bathroomObject.MenstrualProduct,
-	}
-	return bathroomObjectOutput
-}
-
-type bathroomObjectNoID struct {
-	Name             string `json:"name"`
-	Gender           string `json:"gender"`
-	Accessible       bool   `json:"accessible"`
-	MenstrualProduct bool   `json:"menstrualProducts"`
-}
-
-func bathroomObjectWriteHandler(w http.ResponseWriter, r *http.Request) {
-	// Only allow POST requests
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Decode JSON request
-	var bathroomObject bathroomObjectNoID
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&bathroomObject); err != nil {
-		http.Error(w, "Invalid JSON input", http.StatusBadRequest)
-		fmt.Println("Error:", err)
-		return
-	}
-	defer r.Body.Close()
-
-	bathroomObjectOutput := ConvertBathroomObjectToOutput(bathroomObject)
-
-	// Write the bathroomObject to the file
-	if err := writeBathroomToFile(bathroomObjectOutput); err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	// turn bathroomObject back into JSON
-	jsonResponse, err := json.Marshal(bathroomObjectOutput)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return 
-	}
-	
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
-}
-
-func writeBathroomToFile(bathroomObject Bathroom) error {
-	// Read existing data from file
-	file, err := os.ReadFile(bathroomObjectDB)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return err
-	}
-	// Unmarshal the JSON data into a slice of BathroomMap objects
-	var bathrooms []Bathroom
-	err = json.Unmarshal(file, &bathrooms)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return err
-	}
-
-	// Append the new bathroomMap to the JSON
-	bathrooms = append(bathrooms, bathroomObject)
-
-	// Convert the bathrooms to JSON
-	jsonData, err := json.Marshal(bathrooms)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return err
-	}	
-
-	// Write the new JSON to the file
-	err = os.WriteFile(bathroomObjectDB, jsonData, 0644)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return err
-	}
-	return nil
-}
-
 
 func bathroomWriteHandler(w http.ResponseWriter, r *http.Request) {
 	// Only allow POST requests
@@ -426,18 +330,12 @@ func getBathroomMapsByID(id int) (BathroomMapOutput, error) {
 	return BathroomMapOutput{}, errors.New("BathroomMap not found")
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-
 func main() {
-	http.HandleFunc("/", handler)
 	// Define the endpoint and handler function
 	http.HandleFunc("/api/voronoi", voronoiHandler)
 	http.HandleFunc("/api/bathroom/write", bathroomWriteHandler)
-	http.HandleFunc("/api/bathroom/object/write", bathroomObjectWriteHandler)
-	http.HandleFunc("/api/bathroom/get/id", bathroomGetByIDHandler)
-	http.HandleFunc("/api/bathroom/get/maps", bathroomGetHandler)
+	http.HandleFunc("/api/bathroom/maps/id", bathroomGetByIDHandler)
+	http.HandleFunc("/api/bathroom/maps", bathroomGetHandler)
 
 	// Specify the directory containing the files
 	dir := "./images/"
