@@ -39,13 +39,12 @@ func voronoiHandler(w http.ResponseWriter, r *http.Request) {
 	// Process the VoronoiRequest (replace this with your actual Voronoi algorithm implementation)
 	// Here, we simply print the received data for demonstration purposes.
 	fmt.Println("Received matrix:", voronoiReq.Matrix)
-	fmt.Println("Received size:", voronoiReq.Size)
 
 	// run some code to fish out the bathrooms (all points who are greater than 0)
 	bathroomVoronoi, bathroomPoints := FindBathrooms(voronoiReq.Matrix, voronoiReq.Size)
 
 	// create the voronoi output array
-	voronoiOutput := Voronoi(voronoiReq.Matrix, bathroomPoints, voronoiReq.Size)
+	voronoiOutput := Voronoi(voronoiReq.Matrix, bathroomPoints)
 
 	for _, voronoiPoint := range bathroomVoronoi {
 		voronoiOutput[voronoiPoint.point.x][voronoiPoint.point.y] = voronoiPoint.id
