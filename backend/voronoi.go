@@ -140,6 +140,10 @@ func top3Voronoi(voronoiPoints []Point, point Point) []Point {
 	return voronoiPoints
 }
 
+func checkWithinBounds(point Point, sizeX, sizeY int) bool {
+	return point.x < 0 || point.x >= sizeX || point.y < 0 || point.y >= sizeY
+}
+
 // create some sample points
 func createInitSamplePoints(voronoiPoints []Point, numSamplePoints, sizeX, sizeY int) []Point {
 	// initialize sample points
@@ -157,7 +161,7 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints, sizeX, sizeY
 			samplePoint := Point{voronoiPoint.x + rand.Intn(3)+1, voronoiPoint.y + rand.Intn(3)+1}
 
 			// check if within bounds
-			if samplePoint.x < 0 || samplePoint.x >= sizeX || samplePoint.y < 0 || samplePoint.y >= sizeY {
+			if checkWithinBounds(samplePoint, sizeX, sizeY) {
 				continue
 			}
 
@@ -188,7 +192,7 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints, sizeX, sizeY
 		samplePoint := Point{rand.Intn(sizeX-1)+1, rand.Intn(sizeY-1)+1}
 
 		// check if within bounds
-		if samplePoint.x < 0 || samplePoint.x >= sizeX || samplePoint.y < 0 || samplePoint.y >= sizeY {
+		if checkWithinBounds(samplePoint, sizeX, sizeY) {
 			continue
 		}
 

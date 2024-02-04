@@ -41,7 +41,7 @@ func voronoiHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received matrix:", voronoiReq.Matrix)
 
 	// run some code to fish out the bathrooms (all points who are greater than 0)
-	bathroomVoronoi, bathroomPoints := FindBathrooms(voronoiReq.Matrix, voronoiReq.Size)
+	bathroomVoronoi, bathroomPoints := FindBathrooms(voronoiReq.Matrix)
 
 	// create the voronoi output array
 	voronoiOutput := Voronoi(voronoiReq.Matrix, bathroomPoints)

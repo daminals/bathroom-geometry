@@ -85,7 +85,7 @@ def bathroom_get_maps_test():
 #     print(response.json())
         
 
-# voronoi_test()
+voronoi_test()
 # bathroom_write_test()
 # bathroom_get_maps_test()
 # bathroom_get_id_test() 
