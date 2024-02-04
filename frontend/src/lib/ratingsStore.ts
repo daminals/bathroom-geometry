@@ -32,4 +32,4 @@ export function addComment(comment: Comment) {
     console.log(comments); // Log the updated comments array
 }
 
-export const logoutStatus = writable<boolean>(false); 
+export const logoutStatus = writable<boolean>(false);

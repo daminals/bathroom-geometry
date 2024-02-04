@@ -146,14 +146,12 @@
 		justify-content: center; /* Center the content horizontally */
 	}
 	.header {
-		font-family: 'Roboto';
 		position: relative;
 		max-width: 600px;
 		margin: 0 auto;
 		overflow: hidden;
 	}
 	.questionsContainer {
-		font-family: 'Roboto';
 		position: relative;
 		max-width: 600px;
 		margin: 0 auto;

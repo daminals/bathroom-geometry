@@ -192,7 +192,7 @@
 					<ViewBathroom {bathroom} />
 				{/each}
 			</div>
-			<div>
+			<div class="flex justify-center p-2 gap-2">
 				<Button on:click={handleCompute}>Compute Geometry</Button>
 			</div>
 		</div>
