@@ -317,7 +317,7 @@ func Voronoi(matrix [][]int, voronoiPoints []Point) [][]int {
 	}
 	
 	// create initial sample points
-	samplePoints := createInitSamplePoints(voronoiPoints, sizeX*5, sizeX, sizeY)
+	samplePoints := createInitSamplePoints(voronoiPoints, sizeX, sizeX, sizeY)
 	// fmt.Println(samplePoints)
 	filledPoints := 0
 	filledPointList := make([]Point, sizeX*sizeY)
