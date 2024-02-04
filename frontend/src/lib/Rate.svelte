@@ -3,8 +3,10 @@
 	import {
 		accessibilityRating,
 		cleanRating,
+		comments,
 		menstrualRating,
-		overallRating
+		overallRating, 
+		addComment
 	} from './ratingsStore';
 
 	let selectedAccessibilityRating: number | null = null;
@@ -62,6 +64,11 @@
 			cleanRating.set(selectedCleanRating);
 			menstrualRating.set(selectedMenstrualRating);
 			overallRating.set(selectedOverallRating);
+			const comment = {
+                text: feedbackText,
+                user: 'Your User ID' // You need to define a user identifier here
+            };
+            addComment(comment);
 
 			const feedbackData = {
             accessibilityRating: selectedAccessibilityRating,

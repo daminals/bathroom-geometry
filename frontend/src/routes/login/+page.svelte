@@ -1,8 +1,8 @@
 <script lang="ts">
     // Import the Header, Sidebar, and Gallery components
-    import Header from '../lib/Header.svelte';
-    import SidebarGallery from '../lib/SidebarGallery.svelte';
-    import { usernameStore } from '../lib/ratingsStore';
+    import Header from '../../lib/Header.svelte';
+    import Login from '../../lib/Login.svelte';
+    import { usernameStore} from '../../lib/ratingsStore';
     import { onMount } from 'svelte';
 
     let username: string | null = null;
@@ -12,7 +12,10 @@
     });
 </script>
 
-<main class='h-screen w-screen flex flex-col'>
+
+<main>
+    <!-- Your main content goes here -->
+  
     <Header />
     <nav>
         <a href="/" class:selectedLink={window.location.pathname === '/'}>Gallery</a>
@@ -26,19 +29,19 @@
             <a href="/signup" class:selectedLink={window.location.pathname === '/signup'}>Sign Up</a>
         {/if}
     </nav>
-    <div class="h-0 flex-grow w-full flex">
-        <div class="bg-[#333] text-white w-64">
-            <SidebarGallery />
+    <div style="margin-top: 20px;">
+
+            <Login />
         </div>
-    </div>
+
+    
 </main>
 
 <style>
-     /* Style for the navigation links */
-     :global(body) {
-		margin: 0;
-	}
-
+    :global(body) {
+        margin: 0;
+    }
+    /* Style for the navigation links */
     nav {
         background-color: #333; /* Dark background color */
         padding: 10px 0; /* Add padding to the top and bottom */

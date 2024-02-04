@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Rate from './Rate.svelte';
 	import { onMount } from 'svelte';
-	import { comments } from './ratingsStore';
+	import { comments} from './ratingsStore';
+	
 
 	let showForm = false;
 	let currentIndex = 0;
@@ -25,14 +26,20 @@
 	}
 
 	onMount(() => {
-		const unsubscribe = comments.subscribe((value) => {
-			// Update commentsData with the latest comments
-			commentsData = value;
-		});
+    const unsubscribe = comments.subscribe((value) => {
+        // Update commentsData with the latest comments
+        commentsData = value;
+        console.log('Received comments:', commentsData); // Log commentsData to see if it's updating
+    });
 
-		// Unsubscribe from the store to avoid memory leaks
-		return unsubscribe;
-	});
+    // Unsubscribe from the store to avoid memory leaks
+    return unsubscribe;
+});
+
+
+
+
+
 </script>
 
 <div class="gallery-container">
@@ -54,18 +61,19 @@
 			</div>
 		</div>
 		<div class="comments-section">
-			<h3>Comments</h3>
-			{#if commentsData.length > 0}
-				{#each commentsData as comment}
-					<div class="comment">
-						<p>{comment.text}</p>
-						<!-- Display comment text -->
-					</div>
-				{/each}
-			{:else}
-				<p>No comments available</p>
-			{/if}
-		</div>
+            <h3>Comments</h3>
+            {#if commentsData.length > 0}
+                {#each commentsData as comment}
+                    <div class="comment">
+                        <p>{comment.text}</p>
+                        <!-- Display comment text -->
+                    </div>
+                {/each}
+            {:else}
+                <p>No comments available</p>
+            {/if}
+        </div>
+        
 	{/if}
 
 	<!-- Rating Form -->
