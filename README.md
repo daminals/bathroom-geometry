@@ -12,8 +12,8 @@ This project was made for [Hopper Hacks 2024](https://hopperhacks2024.devpost.co
 We're all residents of NYC and a common problem we tend to run into is finding the nearest bathroom that's also accessible and regularly cleaned. 
 However, NYC is a large city and it'd be pretty hard to locate and keep track of the bathroom's on such a scale. So, we decided to shift our focus 
 to the University we all know and love, SBU! We have enough knowledge about the bathrooms on campus for a proof of concept and it could always be 
-scaled up later. Additionally, all the group members have taken a class in Computational Geometry here at SBU and we really wanted to see if we could 
-apply what we learned in that class in the real world. 
+scaled up later. Additionally, all the group members have taken a class in Computational Geometry here at SBU, which we really enjoyed a lot and 
+we really wanted to see if we could apply what we learned in that class in the real world. 
 
 # Challenges & Lessons  
 
