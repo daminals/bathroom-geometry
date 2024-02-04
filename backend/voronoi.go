@@ -18,6 +18,12 @@ type Point struct {
 	x int
 	y int
 }  
+
+type VoronoiPoint struct {
+	point Point
+	id int
+}
+
 //Priority Queue to be used in A* 
 type PriorityQueue []Point  
 
@@ -53,7 +59,6 @@ func astar(matrix [][]int, start, end Point) ([]Point, int) {
 	for len(openSet) > 0 { 
 		current := heap.Pop(&openSet).(Point)  
 
-
 		//Check if we have reached the end
 		if current == end {  
 			// fmt.Println("Reached?")
@@ -78,7 +83,7 @@ func astar(matrix [][]int, start, end Point) ([]Point, int) {
 	} 
 	return nil, 0  
 }
-
+//Recreates Path when end of algorithm is reached
 func reconstructPath(cameFrom map[Point]Point, start, current Point) []Point { 
 	path := make([]Point, 0)
 	for current != start {
@@ -89,7 +94,7 @@ func reconstructPath(cameFrom map[Point]Point, start, current Point) []Point {
 	reversePath(path)
 	return path
 }
-
+//Get's Neighboring Points in order to see what a good move is 
 func getNeighbors(point Point, matrix [][]int) []Point { 
 	neighbors := make([]Point, 0) 
 
@@ -99,7 +104,7 @@ func getNeighbors(point Point, matrix [][]int) []Point {
 		x, y := point.x+move[0], point.y+move[1]
 
 		// Check if the neighbor is within the grid boundaries and is passable
-		if x >= 0 && x < len(matrix) && y >= 0 && y < len(matrix[0]) && matrix[x][y] == 0 {
+		if x >= 0 && x < len(matrix) && y >= 0 && y < len(matrix[0]) && matrix[x][y] != -1 {
 			neighbors = append(neighbors, Point{x, y})
 		}
 	}
@@ -163,6 +168,13 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints int, size int
 					breakFlag = true
 				}
 			}
+
+			for _, point := range voronoiPoints {
+				if samplePoint.x == point.x && samplePoint.y == point.y {
+					breakFlag = true
+				}
+			}	
+
 			if !breakFlag {
 				samplePoints = append(samplePoints, samplePoint)
 			}
@@ -187,6 +199,13 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints int, size int
 				breakFlag = true
 			}
 		}
+
+		for _, point := range voronoiPoints {
+			if samplePoint.x == point.x && samplePoint.y == point.y {
+				breakFlag = true
+			}
+		}
+
 
 		if !breakFlag {
 			samplePoints = append(samplePoints, samplePoint)
@@ -249,7 +268,7 @@ func medianNeighborVornoiID(matrix [][]int, colorMatrix [][]int, point Point) in
 	}
 	// if the most frequent color is the majority, return that color
 	if maxCount > (len(neighbors) / 2 )+1 {	
-		if maxColor != -1 {
+		if maxColor > 0 {
 			return maxColor
 		}
 	}
@@ -266,6 +285,7 @@ func calculateNearestVoronoiID(matrix [][]int, voronoiPoints []Point, voronoiTab
 		return -1
 	}
 
+	// check if point is inside voronoi point list
 	for _, voronoiPoint := range top3Voronoi(voronoiPoints, point) {
 		// calculate distance from sample point to voronoi point
 		distance := distance(matrix, point, voronoiPoint)
@@ -279,7 +299,14 @@ func calculateNearestVoronoiID(matrix [][]int, voronoiPoints []Point, voronoiTab
 }
 
 
-func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
+func Voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
+	
+	// create output matrix
+	outputMatrix := make([][]int, size)
+	for i := range outputMatrix {
+		outputMatrix[i] = make([]int, size)
+	}
+	
 	// create initial sample points
 	samplePoints := createInitSamplePoints(voronoiPoints, size*5, size)
 	// fmt.Println(samplePoints)
@@ -290,18 +317,13 @@ func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 	for _, point := range voronoiPoints {
 		filledPointList[filledPoints] = point
 		filledPoints += 1
+		outputMatrix[point.x][point.y] = 0
 	}
 
 	// add sample points to filledPointList
 	for _, point := range samplePoints {
 		filledPointList[filledPoints] = point
 		filledPoints += 1
-	}
-
-	// create output matrix
-	outputMatrix := make([][]int, size)
-	for i := range outputMatrix {
-		outputMatrix[i] = make([]int, size)
 	}
 
 	voronoiTable := createVoronoiTable(voronoiPoints)
@@ -341,16 +363,43 @@ func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 				voronoiId := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, checkPoint)
 				// update output matrix with voronoi id
 				outputMatrix[checkPoint.x][checkPoint.y] = voronoiId
+				if (filledPoints == size*size) {
+					fmt.Println("Filled all points")
+					fmt.Println(filledPointList)
+					break;
+				}
+
 				filledPointList[filledPoints] = checkPoint
 				filledPoints += 1
 			}
 		}
 	}
 }
+	// loop through voronoi points and add in the actual voronoi id from the table
+	for _, point := range voronoiPoints {
+		outputMatrix[point.x][point.y] = 0
+	}
 
 	// print out filled points
-	// fmt.Println(filledPointList)
+	// fmt.Println(filledPointList) 
+	ID := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, Point{0,0}) 
+	outputMatrix[0][0] = ID 
 	return outputMatrix
+}
+
+func FindBathrooms(matrix [][]int, size int) ([]VoronoiPoint, []Point) {
+	bathrooms := make([]VoronoiPoint, 0)
+	bathroomPoints := make([]Point, 0)
+	for x := 0; x < size; x += 1 {
+		for y := 0; y < size; y += 1 {
+			if matrix[x][y] > 0 {
+				bathroomPoint := Point{x, y}
+				bathroomPoints = append(bathroomPoints, bathroomPoint)
+				bathrooms = append(bathrooms, VoronoiPoint{bathroomPoint, matrix[x][y]})
+			}
+		}
+	}
+	return bathrooms, bathroomPoints
 }
 
 // func jumpFlood(matrix [][]int, voronoiPoints [][]int, size int) {
@@ -387,59 +436,59 @@ func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 // }
 
 
-func main() {
-	grid := [][]int{
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, -1, -1, -1, -1, -1, -1, -1, -1, 0},
-		{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
-		{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
-		{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
-		{0, -1, 0, 0, 0, 0, 0, 45, -1, 0},
-		{0, -1, -1, -1, 0, -1, -1, -1, -1, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-		{0, 0, 0, 0, 0, 0, 0, 0, 34, 0},
-	}
+// func main() {
+// 	grid := [][]int{
+// 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// 		{0, -1, -1, -1, -1, -1, -1, -1, -1, 0},
+// 		{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
+// 		{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
+// 		{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
+// 		{0, -1, 0, 0, 0, 0, 0, 45, -1, 0},
+// 		{0, -1, -1, -1, 0, -1, -1, -1, -1, 0},
+// 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// 		{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// 		{0, 0, 0, 0, 0, 0, 0, 0, 34, 0},
+// 	}
 
-	bathrooms := []Point{
-		{9,8},
-		{5,7},
-	}
+// 	bathrooms := []Point{
+// 		{9,8},
+// 		{5,7},
+// 	}
 
-	voronoiPoints := voronoi(grid, bathrooms, 10)
+// 	voronoiPoints := voronoi(grid, bathrooms, 10)
 
-	// print out voronoi points matrix
-	for _, row := range voronoiPoints {
-		fmt.Println(row)
-	}
+// 	// print out voronoi points matrix
+// 	for _, row := range voronoiPoints {
+// 		fmt.Println(row)
+// 	}
 
 
 
-	// grid := [][]int{
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, -1, -1, -1, -1, -1, -1, -1, -1, 0},
-	// 	{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
-	// 	{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
-	// 	{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
-	// 	{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
-	// 	{0, -1, -1, -1, 0, -1, -1, -1, -1, 0},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 32, 0},
-	// }
-	// start := Point{0, 0}
-	// end := Point{7, 5}
+// 	// grid := [][]int{
+// 	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// 	// 	{0, -1, -1, -1, -1, -1, -1, -1, -1, 0},
+// 	// 	{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
+// 	// 	{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
+// 	// 	{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
+// 	// 	{0, -1, 0, 0, 0, 0, 0, 0, -1, 0},
+// 	// 	{0, -1, -1, -1, 0, -1, -1, -1, -1, 0},
+// 	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+// 	// 	{0, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+// 	// 	{0, 0, 0, 0, 0, 0, 0, 0, 32, 0},
+// 	// }
+// 	// start := Point{0, 0}
+// 	// end := Point{7, 5}
 
-	// fmt.Println(grid[9][8])
+// 	// fmt.Println(grid[9][8])
 
-	// path, cost := astar(grid, start, end)
-	// if path != nil {
-	// 	fmt.Println("Shortest Path:")
-	// 	for _, node := range path {
-	// 		fmt.Printf("(%d, %d) -> ", node.x, node.y)
-	// 	}
-	// 	fmt.Printf("\nTotal Cost: %d\n", cost)
-	// } else {
-	// 	fmt.Println("No path found.")
-	// }
-}
+// 	// path, cost := astar(grid, start, end)
+// 	// if path != nil {
+// 	// 	fmt.Println("Shortest Path:")
+// 	// 	for _, node := range path {
+// 	// 		fmt.Printf("(%d, %d) -> ", node.x, node.y)
+// 	// 	}
+// 	// 	fmt.Printf("\nTotal Cost: %d\n", cost)
+// 	// } else {
+// 	// 	fmt.Println("No path found.")
+// 	// }
+// }
