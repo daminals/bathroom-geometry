@@ -14,9 +14,6 @@ Using A* and Point Sampling algorithms, the SBU Bathroom Finder enables users to
 
 After either logging in or signing up, users unlock even more features. For example, they gain the ability to scroll on Google Maps, insert their own grid, and mark all walls and bathrooms. Then, users can press a "compute geometry" button to generate a Voronoi diagram for an entirely new page. Users can also rate existing restrooms on Stony Brook's campus based on accessibility, cleanliness, and other features. Finally, they can log out when they're finished using the application.
 
-# Challenges & Lessons   
-SBU Bathroom Finder was an interesting and tall project for us to tackle as we didn't have much experience in Golang or Svelte and we had never done any pathfinding or projects that required complex distance calculations before. Doing this in 24 hours didn't make it much easier. However, as a result, we learned a lot and had fun working on the project! Here are some highlights of our challenges and what we learned: 
-
 # How we Built it
 
 ## Backend  
@@ -26,15 +23,9 @@ The problem was though, that the Voronoi diagram implementations we found in Gol
 
 This first led us to the [Jump Flooding Algorithm](https://en.wikipedia.org/wiki/Jump_flooding_algorithm) and we watched [this](https://www.youtube.com/watch?v=AT0jTugdi0M) excellent youtube video explaining the concept, but while this algorithm was cool to learn about, it was out of the scope of this project to create a customized Jump Flooding Algorithm that would account for obstacles. 
 
-If we had more time, we would have written a Jump Flooding Algorithm with the following customizations, based on a few stack overflow posts (notably [this one](https://stackoverflow.com/questions/73255352/creating-a-voroni-diagram-with-arbitrary-boundaries)):
-  - if the tile is colored with the boundary color, discard consideration for recoloring automatically
-  - implement A* for the dist() check which respects the walls
-
 We settled on implementing the Voronoi diagram in an unconventional but more naive approach, taking advantage of A* pathfinding, Distance Hueristics, and some clever splitting of our input into tiles represented by a 2D array.  
 
 With the A* pathfinding algorithm we had to implement our own version as many Golang implementations wanted to take in a string representation which would not be compatible with creating Voronoi diagrams. 
-
-Implementing our own versions of these algorithms was quite difficult as we had no experience coding these before, but eventually we got an approximation of the Voronoi diagram which is pretty close to what we wanted.
 
 Overall, we did end up overcoming most of the challenges we faced in our Backend, though this doesn't mean it's perfect and further optimizations/changes will be mentioned in future sections. So, for now, let's move onto the Frontend challenges.
 
@@ -46,6 +37,7 @@ To make the map interactions fully possible, we also used the Google Maps API. T
 TypeScript was used to store user information from signing up, logging in and completing forms.
 
 # Challenges we ran into
+SBU Bathroom Finder was an interesting and tall project for us to tackle as we didn't have much experience in Golang or Svelte and we had never done any pathfinding or projects that required complex distance calculations before. Doing this in 24 hours didn't make it much easier. Implementing our own versions of the A* and Point Sampling algorithm was quite difficult as we had no experience coding these before, but eventually we got an approximation of the Voronoi diagram which is pretty close to what we wanted.
 
 # Accomplishments that we're proud of
 Our team is proud that we made finding bathrooms more accessible at Stony Brook University. We are also happy we got to implement what we learned in our Computational Geometry class in a software project.
@@ -57,9 +49,6 @@ We also learned how to implement an A* star and point sampling algorithms into o
 # What's next for SBU Bathroom Finder
 We want to implement a more largescale bathroom finder, that is easily adaptable to metropolitan and campus areas. We also want to improve user functionality by having an improved rating experience that is better integrated with our main Gallery and Viewer.
 
-
-
-
-
-
-
+If we had more time, we would have written a Jump Flooding Algorithm with the following customizations, based on a few stack overflow posts (notably [this one](https://stackoverflow.com/questions/73255352/creating-a-voroni-diagram-with-arbitrary-boundaries)):
+  - if the tile is colored with the boundary color, discard consideration for recoloring automatically
+  - implement A* for the dist() check which respects the walls
