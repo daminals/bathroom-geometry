@@ -55,9 +55,19 @@ def bathroom_write_test():
     response = requests.post(testUrl, json=data)
     print(response.text)
 
+def bathroom_get_id_test():
+    testUrl = url + '/api/bathroom/get/id'
+    data = {
+        "ID": 922558862
+    }
+    # load the data as json
+    response = requests.get(testUrl, json=data)
+    print(response.text)
+    print(response.json())
 
 # voronoi_test()
-bathroom_write_test()
+# bathroom_write_test()
+bathroom_get_id_test()
 
 # [[2, -1, 3, 3, 3, 3, -1, 1, 12, 1],
 #  [47, -1, 3, -1, 3, -1, 1, 1, 1, 1],

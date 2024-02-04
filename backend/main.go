@@ -8,6 +8,7 @@ import (
 	"os"
 	"math/rand"
 	"time"
+	"errors"
 	// "voronoi"
 )
 
@@ -207,7 +208,7 @@ func writeBathroomMapToFile(bathroomMap BathroomMapOutput) error {
 
 type BathroomGet struct {
 	Name string `json:"name"`
-	ID int `json:"id"`
+	ID int `json:"ID"`
 }
 
 // // Get BathroomMaps from the file
@@ -230,6 +231,72 @@ type BathroomGet struct {
 // }
 
 
+type BathroomID struct {
+	ID int `json:"ID"`
+}
+
+// bathroom map by id handler
+func bathroomGetByIDHandler(w http.ResponseWriter, r *http.Request) {
+	// Only allow get requests
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	// Decode JSON request
+	var bathroomID BathroomID
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&bathroomID); err != nil {
+		http.Error(w, "Invalid JSON input", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	bathroomMap, err := getBathroomMapsByID(bathroomID.ID)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// turn bathroomMap back into JSON
+	jsonResponse, err := json.Marshal(bathroomMap)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return 
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResponse)
+}
+
+// get bathroom map by ID
+func getBathroomMapsByID(id int) (BathroomMapOutput, error) {
+	// Read existing data from file
+	file, err := os.ReadFile(bathroomsDB)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return BathroomMapOutput{}, err
+	}
+
+	// Unmarshal the JSON data into a slice of BathroomMap objects
+	var bathroomMaps []BathroomMapOutput
+	err = json.Unmarshal(file, &bathroomMaps)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return BathroomMapOutput{}, err
+	}
+
+	// find the bathroom map with the given ID
+	for _, bathroomMap := range bathroomMaps {
+		if bathroomMap.ID == id {
+			return bathroomMap, nil
+		}
+	}
+	
+	return BathroomMapOutput{}, errors.New("BathroomMap not found")
+}
+
+
 
 func handler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
@@ -240,6 +307,7 @@ func main() {
 	// Define the endpoint and handler function
 	http.HandleFunc("/api/voronoi", voronoiHandler)
 	http.HandleFunc("/api/bathroom/write", bathroomWriteHandler)
+	http.HandleFunc("/api/bathroom/get/id", bathroomGetByIDHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 
