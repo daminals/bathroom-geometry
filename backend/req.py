@@ -65,9 +65,24 @@ def bathroom_get_id_test():
     print(response.text)
     print(response.json())
 
+def bathroom_object_write_test():
+    testUrl = url + '/api/bathroom/object/write'
+    data = {
+      "name": "Copium", 
+      "gender": "M",
+      "accessible": True, 
+      "menstrualProducts": False,
+    }
+    # load the data as json
+    response = requests.post(testUrl, json=data)
+    print(response.text)
+    print(response.json())
+        
+
 # voronoi_test()
 # bathroom_write_test()
-bathroom_get_id_test()
+bathroom_object_write_test()
+# bathroom_get_id_test()
 
 # [[2, -1, 3, 3, 3, 3, -1, 1, 12, 1],
 #  [47, -1, 3, -1, 3, -1, 1, 1, 1, 1],
