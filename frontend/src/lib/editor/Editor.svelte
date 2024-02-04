@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { type Bathroom } from '$lib/types';
 	import EditBathroom from '$lib/editor/EditBathroom.svelte';
-	import { Input, Button } from 'flowbite-svelte';
+	import { Input, Button, Label } from 'flowbite-svelte';
 	import { SearchOutline } from 'flowbite-svelte-icons';
 	import { PUBLIC_API_ADDRESS } from '$env/static/public';
 
@@ -19,6 +19,7 @@
 	let grid: number[][];
 	let bathrooms: Map<number, Bathroom> = new Map();
 	let mapName = '';
+	let tileSize = 10;
 
 	// Handle map initialization
 	onMount(async () => {
@@ -106,7 +107,7 @@
 		mode = 'Draw';
 		let bounds = rect.getBounds();
 		if (bounds) {
-			// Calculate number of rectangles (10 meters = 1 recentagle)
+			// Calculate number of rectangles
 			let distanceX = google.maps.geometry.spherical.computeDistanceBetween(
 				new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
 				new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng())
@@ -115,8 +116,8 @@
 				new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
 				new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getNorthEast().lng())
 			);
-			let xCount = Math.ceil(distanceX / 10);
-			let yCount = Math.ceil(distanceY / 10);
+			let xCount = Math.ceil(distanceX / tileSize);
+			let yCount = Math.ceil(distanceY / tileSize);
 
 			// Draw grid within the rectangle
 			const north = bounds.getNorthEast().lat();
@@ -257,33 +258,37 @@
 	}
 </script>
 
-<div class="h-full w-screen flex flex-col">
-	<div class="flex justify-between p-2 bg-primary-800">
+<div class="flex h-full w-screen flex-col">
+	<div class="bg-primary-800 flex justify-between p-2">
 		<form on:submit={handleSubmit}>
 			<Input type="text" placeholder="Search for a place">
 				<SearchOutline slot="left" />
 			</Input>
 		</form>
 		{#if mode === 'Search' && enableCreateGrid}
-			<Button on:click={handleCreateGrid}>Create Grid</Button>
+			<div class='flex gap-2 items-center'>
+				<Label for="tileSize" class="text-white">Tile Size (meters)</Label>
+				<Input class="w-24" type="text" bind:value={tileSize} />
+				<Button on:click={handleCreateGrid}>Create Grid</Button>
+			</div>
 		{:else if mode === 'Draw'}
 			<Button on:click={() => (mode = 'Add')}>Add Bathrooms</Button>
 		{:else if mode === 'Add'}
 			<Button on:click={() => (mode = 'Draw')}>Draw Walls</Button>
 		{/if}
 	</div>
-	<div class="h-0 w-full flex-grow flex">
-		<div class="h-full w-3/5 flex flex-col">
+	<div class="flex h-0 w-full flex-grow">
+		<div class="flex h-full w-3/5 flex-col">
 			<div bind:this={container} class="h-0 w-full flex-grow" />
-			<div class="p-2 text-center bg-slate-100">Current Mode: {mode}</div>
+			<div class="bg-slate-100 p-2 text-center">Current Mode: {mode}</div>
 		</div>
-		<div class="h-full w-2/5 flex flex-col bg-slate-200">
-			<div class="h-0 flex-grow flex flex-col gap-2 overflow-y-scroll p-2">
+		<div class="flex h-full w-2/5 flex-col bg-slate-200">
+			<div class="flex h-0 flex-grow flex-col gap-2 overflow-y-scroll p-2">
 				{#each Array.from(bathrooms.values()) as bathroom}
 					<EditBathroom {bathroom} />
 				{/each}
 			</div>
-			<div class="flex justify-center p-2 gap-2">
+			<div class="flex justify-center gap-2 p-2">
 				<Input type="text" placeholder="Map Name" bind:value={mapName} />
 				<Button on:click={handleSave}>Save</Button>
 			</div>
