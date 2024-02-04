@@ -43,7 +43,8 @@ For reference here's what our code was outputting when we were having difficulti
 <img src="https://github.com/daminals/bathroom-geometry/assets/107337676/bc2fe815-447c-467a-a986-675fd2754aba" width="600" height="600">
 
 
-Here's what it was outputting once it was fixed: 
+Here's what it was outputting once it was fixed:  
+
 <img src="https://cdn.discordapp.com/attachments/1181082647833890876/1203723383288762368/Screenshot_2024-02-04_at_10.26.55_AM.png?ex=65d221c2&is=65bfacc2&hm=9a90f6dc25f6910add98bda01c167e7b06eac275b6136a9f7ac147946bca9804&" width="600" height="600">
 
 
