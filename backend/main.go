@@ -13,6 +13,7 @@ import (
 )
 
 const bathroomsDB = "bathroomsDB.json"
+const bathroomObjectsDB = "bathroomObjectsDB.json"
 
 // VoronoiRequest represents the JSON input structure.
 type VoronoiRequest struct {
@@ -149,6 +150,32 @@ func bathroomWriteHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResponse)
+}
+
+func writeBathroomToFile(bathroomObject Bathroom) error {
+	// Read existing data from file
+	file, err := os.ReadFile(bathroomsDB)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+	// Unmarshal the JSON data into a slice of BathroomMap objects
+	var bathroomMaps []BathroomMapOutput
+	err = json.Unmarshal(file, &bathroomMaps)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+
+	// Append the new bathroomMap to the JSON
+	bathroomMaps = append(bathroomMaps, bathroomMap)
+
+	// Convert the bathroomMaps to JSON
+	jsonData, err := json.Marshal(bathroomMaps)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}	
 }
 
 // write a new bathroom map to the file
@@ -296,8 +323,6 @@ func getBathroomMapsByID(id int) (BathroomMapOutput, error) {
 	return BathroomMapOutput{}, errors.New("BathroomMap not found")
 }
 
-
-
 func handler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
@@ -308,6 +333,15 @@ func main() {
 	http.HandleFunc("/api/voronoi", voronoiHandler)
 	http.HandleFunc("/api/bathroom/write", bathroomWriteHandler)
 	http.HandleFunc("/api/bathroom/get/id", bathroomGetByIDHandler)
+
+	// Specify the directory containing the files
+	dir := "./images/"
+	// Create a file server handler for the specified directory
+	fileServer := http.FileServer(http.Dir(dir))
+	// Create a handler function to serve files with modified URLs
+	http.Handle("/images/", http.StripPrefix("/images", fileServer))
+
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 
