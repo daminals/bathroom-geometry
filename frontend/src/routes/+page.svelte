@@ -16,7 +16,7 @@
     <Header />
     <nav>
         <a href="/">Gallery</a>
-        {#if username !== null}
+        {#if username !== ""}
             <!-- If the user is logged in, show logout and other links -->
             <a href="/logout">Logout</a>
             <a href="/new">New</a>
