@@ -357,8 +357,8 @@ func main() {
 	// Define the endpoint and handler function
 	http.HandleFunc("/api/voronoi", enableCORS(voronoiHandler))
 	http.HandleFunc("/api/bathroom/write", enableCORS(bathroomWriteHandler))
-	http.HandleFunc("/api/bathroom/get/maps/id", enableCORS(bathroomGetByIDHandler))
-	http.HandleFunc("/api/bathroom/get/maps", enableCORS(bathroomGetHandler))
+	http.HandleFunc("/api/bathroom/maps/id", enableCORS(bathroomGetByIDHandler))
+	http.HandleFunc("/api/bathroom/maps", enableCORS(bathroomGetHandler))
 
 	// Specify the directory containing the files
 	dir := "./images/"
