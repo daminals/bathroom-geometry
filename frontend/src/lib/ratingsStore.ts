@@ -15,6 +15,14 @@ export interface Comment {
     // Add any other properties if necessary
 }
 
+export interface UserCredentials {
+    username: string;
+    password: string;
+}
+
+export const usernameStore = writable<string>('');
+export const passwordStore = writable<string>('');
+
 // Create a writable store for comments
 export const comments = writable<Comment[]>([]);
 
@@ -23,3 +31,5 @@ export function addComment(comment: Comment) {
     comments.update(existingComments => [...existingComments, comment]);
     console.log(comments); // Log the updated comments array
 }
+
+export const logoutStatus = writable<boolean>(false); 

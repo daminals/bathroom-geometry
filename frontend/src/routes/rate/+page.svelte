@@ -1,20 +1,32 @@
-<script>
+<script lang="ts">
     // Import the Header, Sidebar, and Gallery components
     import Header from '../../lib/Header.svelte';
     import Sidebar from '../../lib/Sidebar.svelte';
     import RatePage from '../../lib/RatePage.svelte'; // Adjust the path accordingly
-
+    import { usernameStore} from '../../lib/ratingsStore';
+    let username: string | null = null; // 
+  
+usernameStore.subscribe(value => {
+    username = value;
+});
+console.log(username)
 </script>
 
 
 <main class='h-screen w-screen flex flex-col'>
     <!-- Your main content goes here -->
     <Header />
-	<nav>
-		<a href="/">Gallery</a>
-        <a href="/new">New</a>
-        <a href="/edit">Edit</a>
-        <a href="/rate">Rate</a>
+    <nav>
+        <a href="/" class:selectedLink={window.location.pathname === '/'}>Gallery</a>
+        {#if username !== ""}
+            <a href="/logout" class:selectedLink={window.location.pathname === '/logout'}>Logout</a>
+            <a href="/new" class:selectedLink={window.location.pathname === '/new'}>New</a>
+            <a href="/edit" class:selectedLink={window.location.pathname === '/edit'}>Edit</a>
+            <a href="/rate" class:selectedLink={window.location.pathname === '/rate'}>Rate</a>
+        {:else}
+            <a href="/login" class:selectedLink={window.location.pathname === '/login'}>Login</a>
+            <a href="/signup" class:selectedLink={window.location.pathname === '/signup'}>Sign Up</a>
+        {/if}
     </nav>
     <div class="h-0 flex-grow w-full flex">
         <div class="bg-[#333] text-white w-64">
@@ -47,10 +59,8 @@
     nav a:hover {
         background-color: #555; /* Darker background color on hover */
     }
-
-    /* Adjustments to make the content align properly */
-    .content {
-        display: flex;
-        align-items: flex-start; /* Align items at the start of the cross axis */
+    nav a.selectedLink {
+        background-color: #555; /* Darker background color on hover */
     }
+   
 </style>
