@@ -62,6 +62,16 @@
 			cleanRating.set(selectedCleanRating);
 			menstrualRating.set(selectedMenstrualRating);
 			overallRating.set(selectedOverallRating);
+
+			const feedbackData = {
+            accessibilityRating: selectedAccessibilityRating,
+            cleanRating: selectedCleanRating,
+            menstrualRating: selectedMenstrualRating,
+            overallRating: selectedOverallRating,
+            feedbackText: feedbackText // Include the feedback text
+        };
+
+        console.log('Feedback Data:', feedbackData);
 		}
 	}
 </script>
