@@ -1,8 +1,7 @@
 <script>
     // Import the Header, Sidebar, and Gallery components
     import Header from '../../lib/Header.svelte';
-    import Sidebar from '../../lib/Sidebar.svelte';
-    import RatePage from '../../lib/RatePage.svelte'; // Adjust the path accordingly
+    import SidebarEdit from '../../lib/SidebarEdit.svelte';
 
 </script>
 
@@ -19,9 +18,8 @@
     </nav>
     <div class="content">
         <div class="sidebar-content">
-            <Sidebar />
+            <SidebarEdit />
         </div>
-        <RatePage /> <!-- Include the Gallery component -->
     </div>
     
 </main>
