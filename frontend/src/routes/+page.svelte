@@ -5,7 +5,7 @@
 </script>
 
 
-<main>
+<main class='h-screen w-screen flex flex-col'>
     <Header />
     <nav>
         <a href="/">Gallery</a>
@@ -13,8 +13,8 @@
         <a href="/edit">Edit</a>
         <a href="/rate">Rate</a>
     </nav>
-    <div class="content">
-        <div class="sidebar-content">
+    <div class="h-0 flex-grow w-full flex">
+        <div class="bg-[#333] text-white w-64">
             <SidebarGallery />
         </div>
     </div>
@@ -26,7 +26,7 @@
 		margin: 0;
 	}
 
-     nav {
+    nav {
         background-color: #333; /* Dark background color */
         padding: 10px 0; /* Add padding to the top and bottom */
     }
@@ -42,11 +42,5 @@
 
     nav a:hover {
         background-color: #555; /* Darker background color on hover */
-    }
-
-    /* Adjustments to make the content align properly */
-    .content {
-        display: flex;
-        align-items: flex-start; /* Align items at the start of the cross axis */
     }
 </style>

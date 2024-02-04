@@ -7,9 +7,8 @@
 </script>
 
 
-<main>
+<main class='h-screen w-screen flex flex-col'>
     <!-- Your main content goes here -->
-  
     <Header />
 	<nav>
 		<a href="/">Gallery</a>
@@ -17,8 +16,8 @@
         <a href="/edit">Edit</a>
         <a href="/rate">Rate</a>
     </nav>
-    <div class="content">
-        <div class="sidebar-content">
+    <div class="h-0 flex-grow w-full flex">
+        <div class="bg-[#333] text-white w-64">
             <Sidebar />
         </div>
         <RatePage /> <!-- Include the Gallery component -->

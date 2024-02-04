@@ -7,25 +7,10 @@ import { accessibilityRating, cleanRating, menstrualRating, overallRating } from
     
 </script>
 
-<aside>
+<div>
   <h2>Ratings</h2>
   <p>Accessibility Rating: {$accessibilityRating.toFixed(0)}</p>
   <p>Clean Rating: {$cleanRating.toFixed(0)}</p>
   <p>Menstrual Rating: {$menstrualRating.toFixed(0)}</p>
   <p>Overall Rating: {$overallRating.toFixed(0)}</p>
-</aside>
-
-
-<style>
-    /* Header component styles */
-    aside {
-        width: 200px;
-        background-color: #333;
-        position: absolute;
-        top: 125px;
-        bottom: 0;
-        text-align: center;
-        font-family: 'Roboto', sans-serif;
-        color: #fff;
-    }
-</style>
+</div>
