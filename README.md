@@ -29,10 +29,11 @@ Overall, we did end up overcoming most of the challenges we faced in our Backend
 
 ## Frontend
 
-# Where do we go from here?  
-When it comes to the future of SBU Bathroom Finder, there are several things that we wish we could've done if not for the time limit of 24 hours. I/O to JSON Files and loading previously made maps could be made more efficient with the use of a database like MongoDB or SQL. There may be other data structures or algorithms we 
+# Where do we go from here?   
 
+When it comes to the future of SBU Bathroom Finder, there are several things that we wish we could've done if not for the time limit of 24 hours. I/O to JSON Files and loading previously made maps could be made more efficient with the use of a database like MongoDB or SQL. In the use of a database we could also take advantage of showing many more pre-made maps that are contributed from the community. 
 
+In terms of our A* implmenetation and how we created the Voronoi there may be other data structures or algorithms we could've explored to optimize the time and space complexity, but our implementation runs quite well regardless.
 
 # Technical Details 
 
