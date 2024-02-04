@@ -1,19 +1,11 @@
 ![github repo badge: frontend](https://img.shields.io/badge/Frontend-Svelte-Red) ![github repo badge: frontend](https://img.shields.io/badge/Frontend-TypeScript-Blue) ![github repo badge: backend](https://img.shields.io/badge/Backend-Go-8A2BE2) ![github repo badge: backend](https://img.shields.io/badge/Backend-Python-Orange) 
 
 # SBU Bathroom Finder
-SBU Bathroom Finder is a WebApp that helps you find the nearest and greatest bathroom for you on StonyBrook's Campus! It allows for users to 
-filter the bathrooms by not only gender, but accesibility, ratings, and amenities as well! 
-While it's currently limited to StonyBrook's Campus as it's the campus we're most familiar with, community members from other universities can 
-feel free to contribute to our repo and create maps for their campuses using our built-in map creator! 
-
+Welcome to SBU Bathroom Finder, your go-to WebApp for locating the nearest and best bathrooms on Stony Brook University's campus! Tailor your restroom search based on gender, accessibility, ratings, and amenities. While currently designed for SBU, our open-source approach invites community members from other universities to contribute and create maps for their campuses using our built-in map creator. Explore and find the perfect bathroom with ease!
 This project was made for [Hopper Hacks 2024](https://hopperhacks2024.devpost.com/) and we hope you enjoy our project!  
 
 # Inspiration 
-We're all residents of NYC and a common problem we tend to run into is finding the nearest bathroom that's also accessible and regularly cleaned. 
-However, NYC is a large city and it'd be pretty hard to locate and keep track of the bathroom's on such a scale. So, we decided to shift our focus 
-to the University we all know and love, SBU! We have enough knowledge about the bathrooms on campus for a proof of concept and it could always be 
-scaled up later. Additionally, all the group members have taken a class in Computational Geometry here at SBU, which we really enjoyed a lot and 
-we really wanted to see if we could apply what we learned in that class in the real world. 
+As residents of NYC, we've all faced the challenge of locating clean and accessible bathrooms in a bustling city. Recognizing the widespread nature of this issue, we decided to tackle it on a smaller scale—starting with the the University, we all know and love, SBU! Our collective knowledge about the campus bathrooms served as a proof of concept, inviting others to contribute and adapt the solution to their own university environments.  
 
 # Challenges & Lessons  
 
