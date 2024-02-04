@@ -58,6 +58,12 @@ func voronoiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
+type BathroomMap struct{ 
+	ID int64 `json:"id omitempty"`  
+	Name string `json:"name"`
+}
+
+
 func handler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
