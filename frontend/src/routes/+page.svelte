@@ -18,8 +18,8 @@
         <a href="/" class:selectedLink={window.location.pathname === '/'}>Gallery</a>
         {#if username !== ""}
             <a href="/logout" class:selectedLink={window.location.pathname === '/logout'}>Logout</a>
-            <a href="/new" class:selectedLink={window.location.pathname === '/new'}>New</a>
-            <a href="/edit" class:selectedLink={window.location.pathname === '/edit'}>Edit</a>
+            <a href="/editor" class:selectedLink={window.location.pathname === '/editor'}>Editor</a>
+			<a href="/viewer" class:selectedLink={window.location.pathname === '/viewer'}>Viewer</a>
             <a href="/rate" class:selectedLink={window.location.pathname === '/rate'}>Rate</a>
         {:else}
             <a href="/login" class:selectedLink={window.location.pathname === '/login'}>Login</a>
