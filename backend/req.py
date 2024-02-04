@@ -68,7 +68,7 @@ def bathroom_get_id_test():
 def bathroom_get_maps_test(): 
     testUrl = url + '/api/bathroom/get/maps' 
     response = requests.get(testUrl) 
-    print(response.text) 
+    # print(response.text) 
     print(response.json()) 
 
 def bathroom_object_write_test():
