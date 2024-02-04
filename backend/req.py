@@ -56,7 +56,7 @@ def bathroom_write_test():
     print(response.text)
 
 def bathroom_get_id_test():
-    testUrl = url + '/api/bathroom/get/id'
+    testUrl = url + '/api/bathroom/maps/id'
     data = {
         "ID": 922558862
     }
@@ -66,29 +66,28 @@ def bathroom_get_id_test():
     print(response.json())
 
 def bathroom_get_maps_test(): 
-    testUrl = url + '/api/bathroom/get/maps' 
+    testUrl = url + '/api/bathroom/maps' 
     response = requests.get(testUrl) 
     # print(response.text) 
     print(response.json()) 
 
-def bathroom_object_write_test():
-    testUrl = url + '/api/bathroom/object/write'
-    data = {
-      "name": "Copium", 
-      "gender": "M",
-      "accessible": True, 
-      "menstrualProducts": False,
-    }
-    # load the data as json
-    response = requests.post(testUrl, json=data)
-    print(response.text)
-    print(response.json())
+# def bathroom_object_write_test():
+#     testUrl = url + '/api/bathroom/object/write'
+#     data = {
+#       "name": "Copium", 
+#       "gender": "M",
+#       "accessible": True, 
+#       "menstrualProducts": False,
+#     }
+#     # load the data as json
+#     response = requests.post(testUrl, json=data)
+#     print(response.text)
+#     print(response.json())
         
 
-# voronoi_test()
+voronoi_test()
 # bathroom_write_test()
-# bathroom_object_write_test() 
-bathroom_get_maps_test()
+# bathroom_get_maps_test()
 # bathroom_get_id_test() 
 
 
