@@ -57,34 +57,39 @@ func astar(matrix [][]int, start, end Point) ([]Point, int) {
 
 	cameFrom := make(map[Point]Point)
 	gScore := make(map[Point]int)
+	fScore := make(map[Point]int)
+	closedSet := make(map[Point]bool)
 
 	heap.Push(&openSet, start)
 	gScore[start] = 0
+	fScore[start] = distanceFormula(start, end)
 
 	for len(openSet) > 0 {
 		current := heap.Pop(&openSet).(Point)
 
 		//Check if we have reached the end
 		if current == end {
-			// fmt.Println("Reached?")
 			path := reconstructPath(cameFrom, start, end)
 			return path, gScore[end]
 		}
 
+		closedSet[current] = true
+
 		neighbors := getNeighbors(current, matrix)
 		for _, neighbor := range neighbors {
-			//fmt.Println("Reached?")
+			if closedSet[neighbor] {
+				continue
+			}
+
 			tentG := gScore[current] + 1
 
 			if _, ok := gScore[neighbor]; !ok || tentG < gScore[neighbor] {
-				//fmt.Println("Reached? 2")
 				gScore[neighbor] = tentG
+				fScore[neighbor] = gScore[neighbor] + distanceFormula(neighbor, end)
 				heap.Push(&openSet, neighbor)
 				cameFrom[neighbor] = current
 			}
 		}
-		// fmt.Println("(",current.x,",", current.y,")")
-		// fmt.Println(len(openSet))
 	}
 	return nil, 0
 }
@@ -140,12 +145,28 @@ func top3Voronoi(voronoiPoints []Point, point Point) []Point {
 	sort.Slice(voronoiPoints, func(i, j int) bool {
 		return distanceFormula(voronoiPoints[i], point) < distanceFormula(voronoiPoints[j], point)
 	})
-	if len(voronoiPoints) > 3 {
+	if len(voronoiPoints) > 5 {
 		// return top 3
-		return voronoiPoints[:3]
+		return voronoiPoints[:5]
 	}
 	// else return all
 	return voronoiPoints
+}
+
+// creates an array of voronoi points which are the closest voronois to this points neighbors
+func friendlyVoronoiPoints(outputMatrix [][]int, voronoiTable map[int]Point, point Point) []Point {
+	neighbors := getNeighbors(point, outputMatrix)
+	// voronoi points
+	neighborVoronoiPoints := make([]Point, 0)
+	for _, neighbor := range neighbors {
+		neighborVoronoiId := outputMatrix[neighbor.x][neighbor.y]
+		if (neighborVoronoiId > 0) {
+			// get voronoi point
+			neighborVoronoiPoint := voronoiTable[neighborVoronoiId]
+			neighborVoronoiPoints = append(neighborVoronoiPoints, neighborVoronoiPoint)
+		}
+	}
+	return neighborVoronoiPoints
 }
 
 func checkWithinBounds(point Point, sizeX, sizeY int) bool {
@@ -288,7 +309,27 @@ func medianNeighborVornoiID(matrix [][]int, colorMatrix [][]int, point Point) in
 	return -1
 }
 
-func calculateNearestVoronoiID(matrix [][]int, voronoiPoints []Point, voronoiTable map[int]Point, point Point) int {
+func isInArray(points []Point, point Point) bool {
+	for _, p := range points {
+		if p.x == point.x && p.y == point.y {
+			return true
+		}
+	}
+	return false
+}
+
+func combinePointList(points1, points2 []Point) []Point {
+	combinedPoints := make([]Point, len(points1))
+	copy(combinedPoints, points1)
+	for _, point := range points2 {
+		if !(isInArray(combinedPoints, point)) {
+			combinedPoints = append(combinedPoints, point)
+		}
+	}
+	return combinedPoints
+}
+
+func calculateNearestVoronoiID(matrix, outputMatrix [][]int, voronoiPoints []Point, voronoiTable map[int]Point, point Point) int {
 	minDistance := MaxInt
 	voronoiId := -1
 
@@ -297,8 +338,13 @@ func calculateNearestVoronoiID(matrix [][]int, voronoiPoints []Point, voronoiTab
 		return -1
 	}
 
+	friendlyVoronoiPoints := friendlyVoronoiPoints(outputMatrix, voronoiTable, point)
+	top3VoronoiPoints := top3Voronoi(voronoiPoints, point)
+	// combine voronoi points into one list
+	voronoiPointChecklist := combinePointList(friendlyVoronoiPoints, top3VoronoiPoints)
+
 	// check if point is inside voronoi point list
-	for _, voronoiPoint := range top3Voronoi(voronoiPoints, point) {
+	for _, voronoiPoint := range voronoiPointChecklist {
 		// calculate distance from sample point to voronoi point
 		distance := distance(matrix, point, voronoiPoint)
 		// update matrix with voronoi point id
@@ -355,8 +401,8 @@ func Voronoi(matrix [][]int, voronoiPointsWithIds []VoronoiPoint) [][]int {
 
 	// calculate distance from each sample point to some voronoi points
 	for _, point := range samplePoints {
-		voronoiId := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, point)
-		// update output matrix with voronoi id
+		voronoiId := calculateNearestVoronoiID(matrix,outputMatrix, voronoiPoints, voronoiTable, point)
+		// update output matrix with voronoi id 
 		outputMatrix[point.x][point.y] = voronoiId
 	}
 
@@ -384,7 +430,7 @@ func Voronoi(matrix [][]int, voronoiPointsWithIds []VoronoiPoint) [][]int {
 				filledPoints += 1
 			} else {
 				// calculate distance to near voronoi point
-				voronoiId := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, checkPoint)
+				voronoiId := calculateNearestVoronoiID(matrix,outputMatrix, voronoiPoints, voronoiTable, checkPoint)
 				// update output matrix with voronoi id
 				outputMatrix[checkPoint.x][checkPoint.y] = voronoiId
 				if (filledPoints == sizeX*sizeY) {
@@ -406,7 +452,7 @@ func Voronoi(matrix [][]int, voronoiPointsWithIds []VoronoiPoint) [][]int {
 
 	// print out filled points
 	// fmt.Println(filledPointList) 
-	ID := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, Point{0,0}) 
+	ID := calculateNearestVoronoiID(matrix,outputMatrix, voronoiPoints, voronoiTable, Point{0,0}) 
 	outputMatrix[0][0] = ID 
 	return outputMatrix
 }

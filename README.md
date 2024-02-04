@@ -17,15 +17,20 @@ Deciding our implementation and what exactly we wanted to achieve was pretty tou
 
 The problem was though, that the Voronoi diagram implementations we found in Golang did not account for walls, which was problematic given that we couldn't just have people phase through the walls and so we started trying to implement our own. 
 
-This first led us to the [Jump Flooding Algorithm](https://en.wikipedia.org/wiki/Jump_flooding_algorithm) and we watched [this](https://www.youtube.com/watch?v=AT0jTugdi0M) excellent youtube video explaining the concept, but while this algorithm was cool to learn about, it was out of the scope of this project to create a customized Jump Flood Algorithm that would account for obstacles. 
+This first led us to the [Jump Flooding Algorithm](https://en.wikipedia.org/wiki/Jump_flooding_algorithm) and we watched [this](https://www.youtube.com/watch?v=AT0jTugdi0M) excellent youtube video explaining the concept, but while this algorithm was cool to learn about, it was out of the scope of this project to create a customized Jump Flooding Algorithm that would account for obstacles. 
 
-We settled on implementing the Voronoi diagram in an unconventional way, taking advantage of A* pathfinding, Distance Hueristics, and some clever splitting of our input into tiles represented by a 2D array.  
+If we had more time, we would have written a Jump Flooding Algorithm with the following customizations, based on a few stack overflow posts (notably [this one](https://stackoverflow.com/questions/73255352/creating-a-voroni-diagram-with-arbitrary-boundaries)):
+  - if the tile is colored with the boundary color, discard consideration for recoloring automatically
+  - implement A* for the dist() check which respects the walls
+
+We settled on implementing the Voronoi diagram in an unconventional but more naive approach, taking advantage of A* pathfinding, Distance Hueristics, and some clever splitting of our input into tiles represented by a 2D array.  
 
 With the A* pathfinding algorithm we had to implement our own version as many Golang implementations wanted to take in a string representation which would not be compatible with creating Voronoi diagrams. 
 
-Implementing our own versions of these algorithms was quite difficult as we had no experience coding these before, but eventually it became smooth sailing until we had to deal with coding endpoints for the part of the team working on the frontend. The I/O to JSON files and their formatting was a bit tricky to decide on and figure out in Golang as the sytax was quite different from languages like python or java. 
+Implementing our own versions of these algorithms was quite difficult as we had no experience coding these before, but eventually we got an approximation of the Voronoi diagram which is pretty close to what we wanted.
 
 Overall, we did end up overcoming most of the challenges we faced in our Backend, though this doesn't mean it's perfect and further optimizations/changes will be mentioned in future sections. So, for now, let's move onto the Frontend challenges. 
+
 ## Frontend
 
 # Where do we go from here? 
