@@ -1,12 +1,11 @@
 <script>
     import Rate from "./Rate.svelte";
-    
+    import {comments} from './ratingsStore';
     let showForm = false;
     let currentIndex = 0;
     let images = [
         { name: "Image 1", src: "grid.jpg" },
-        { name: "Image 2", src: "grid.jpg" },
-        { name: "Image 3", src: "grid.jpg" }
+        { name: "Image 2", src: "grid.jpg" }
     ];
 
     function prevImage() {
@@ -24,6 +23,7 @@
 
 <div class="gallery-container">
     {#if !showForm}
+    
         <div class="gallery">
             <h2>{images[currentIndex].name}</h2>
             {#each images as { src }, index}
@@ -44,6 +44,8 @@
         </div>
     {/if}
 </div>
+
+
 
 <style>
     .gallery-container {

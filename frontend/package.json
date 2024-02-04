@@ -39,6 +39,7 @@
 	"type": "module",
 	"dependencies": {
 		"@types/google.maps": "^3.55.1",
-		"flowbite-svelte-icons": "^1.2.1"
+		"flowbite-svelte-icons": "^1.2.1",
+		"svelte-routing": "^2.11.0"
 	}
 }
