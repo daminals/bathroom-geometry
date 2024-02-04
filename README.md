@@ -40,11 +40,11 @@ TypeScript was used to store user information from signing up, logging in and co
 SBU Bathroom Finder was an interesting and tall project for us to tackle as we didn't have much experience in Golang or Svelte and we had never done any pathfinding or projects that required complex distance calculations before. Doing this in 24 hours didn't make it much easier. Implementing our own versions of the A* and Point Sampling algorithm was quite difficult as we had no experience coding these before, but eventually we got an approximation of the Voronoi diagram which is pretty close to what we wanted.  
 
 For reference here's what our code was outputting when we were having difficulties and it broke: 
-<img src="https://github.com/daminals/bathroom-geometry/assets/107337676/bc2fe815-447c-467a-a986-675fd2754aba" width="800" height="800">
+<img src="https://github.com/daminals/bathroom-geometry/assets/107337676/bc2fe815-447c-467a-a986-675fd2754aba" width="600" height="600">
 
 
 Here's what it was outputting once it was fixed: 
-<img src="https://cdn.discordapp.com/attachments/1181082647833890876/1203723383288762368/Screenshot_2024-02-04_at_10.26.55_AM.png?ex=65d221c2&is=65bfacc2&hm=9a90f6dc25f6910add98bda01c167e7b06eac275b6136a9f7ac147946bca9804&" width="800" height="800">
+<img src="https://cdn.discordapp.com/attachments/1181082647833890876/1203723383288762368/Screenshot_2024-02-04_at_10.26.55_AM.png?ex=65d221c2&is=65bfacc2&hm=9a90f6dc25f6910add98bda01c167e7b06eac275b6136a9f7ac147946bca9804&" width="600" height="600">
 
 
 # Accomplishments that we're proud of
