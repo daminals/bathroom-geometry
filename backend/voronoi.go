@@ -375,7 +375,9 @@ func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 	}
 
 	// print out filled points
-	// fmt.Println(filledPointList)
+	// fmt.Println(filledPointList) 
+	ID := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, Point{0,0}) 
+	outputMatrix[0][0] = ID 
 	return outputMatrix
 }
 
