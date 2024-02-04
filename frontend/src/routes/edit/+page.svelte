@@ -1,32 +1,37 @@
 <script>
     // Import the Header, Sidebar, and Gallery components
-    import Header from '../lib/Header.svelte';
-    import SidebarGallery from '../lib/SidebarGallery.svelte';
+    import Header from '../../lib/Header.svelte';
+    import Sidebar from '../../lib/Sidebar.svelte';
+    import RatePage from '../../lib/RatePage.svelte'; // Adjust the path accordingly
+
 </script>
 
 
 <main>
+    <!-- Your main content goes here -->
+  
     <Header />
-    <nav>
-        <a href="/">Gallery</a>
+	<nav>
+		<a href="/">Gallery</a>
         <a href="/new">New</a>
         <a href="/edit">Edit</a>
         <a href="/rate">Rate</a>
     </nav>
     <div class="content">
         <div class="sidebar-content">
-            <SidebarGallery />
+            <Sidebar />
         </div>
+        <RatePage /> <!-- Include the Gallery component -->
     </div>
+    
 </main>
 
 <style>
-     /* Style for the navigation links */
-     :global(body) {
+	:global(body) {
 		margin: 0;
 	}
-
-     nav {
+    /* Style for the navigation links */
+    nav {
         background-color: #333; /* Dark background color */
         padding: 10px 0; /* Add padding to the top and bottom */
     }
