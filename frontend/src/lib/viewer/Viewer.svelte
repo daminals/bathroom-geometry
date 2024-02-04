@@ -3,6 +3,7 @@
 	import { type Bathroom } from '$lib/types';
 	import ViewBathroom from '$lib/viewer/ViewBathroom.svelte';
 	import { Input } from 'flowbite-svelte';
+	import { PUBLIC_API_ADDRESS } from '$env/static/public';
 
 	let container: HTMLDivElement;
 	let map: google.maps.Map;
@@ -67,17 +68,25 @@
 		return hexColor.toUpperCase();
 	}
 
-	// Handle JSON input
+	// Handle ID input
 	let markers: Map<number, google.maps.Marker> = new Map();
 	let rectangles: google.maps.Rectangle[] = [];
-	function handleSubmit(event: Event) {
+	async function handleSubmit(event: Event) {
 		event.preventDefault();
 		const form = event.target as HTMLFormElement;
 		const input = form.querySelector('input') as HTMLInputElement;
 		const value = input.value;
 
 		if (value && map) {
-			const data = JSON.parse(value) as BathroomMap;
+			const json = JSON.stringify({ ID: parseInt(value) });
+			const res = await fetch(`${PUBLIC_API_ADDRESS}/bathroom/get/maps/id`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: json
+			});
+			const data = (await res.json()) as BathroomMap;
 			mapName = data.name;
 			grid = data.grid;
 			bathrooms = new Map();
@@ -119,7 +128,7 @@
 							label: {
 								text: grid[i][j].toString(),
 								color: 'white'
-							},
+							}
 						});
 						markers.set(grid[i][j], marker);
 						color = bathrooms.get(grid[i][j])?.color || 'white';
@@ -146,7 +155,7 @@
 <div class="flex h-full w-screen flex-col">
 	<div class="bg-primary-800 flex justify-between p-2">
 		<form on:submit={handleSubmit}>
-			<Input type="text" placeholder="Enter JSON"></Input>
+			<Input type="text" placeholder="Enter ID"></Input>
 		</form>
 	</div>
 	<div class="flex h-0 w-full flex-grow">

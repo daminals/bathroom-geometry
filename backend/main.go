@@ -270,11 +270,6 @@ type BathroomID struct {
 
 // bathroom map by id handler
 func bathroomGetByIDHandler(w http.ResponseWriter, r *http.Request) {
-	// Only allow get requests
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
 	// Decode JSON request
 	var bathroomID BathroomID
 	decoder := json.NewDecoder(r.Body)
@@ -362,8 +357,7 @@ func main() {
 	// Define the endpoint and handler function
 	http.HandleFunc("/api/voronoi", enableCORS(voronoiHandler))
 	http.HandleFunc("/api/bathroom/write", enableCORS(bathroomWriteHandler))
-	http.HandleFunc("/api/bathroom/object/write", enableCORS(bathroomObjectWriteHandler))
-	http.HandleFunc("/api/bathroom/get/id", enableCORS(bathroomGetByIDHandler))
+	http.HandleFunc("/api/bathroom/get/maps/id", enableCORS(bathroomGetByIDHandler))
 	http.HandleFunc("/api/bathroom/get/maps", enableCORS(bathroomGetHandler))
 
 	// Specify the directory containing the files
