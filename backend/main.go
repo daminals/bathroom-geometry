@@ -337,26 +337,19 @@ func getBathroomMapsFromFile() ([]BathroomGet, error) {
     return bathroomGets, err; 
 }
 //bathroom maps by both name and ID 
-func bathroomGetMaps(w http.ResponseWriter, r *http.Request){ 
+func bathroomGetHandler(w http.ResponseWriter, r *http.Request){ 
 	//Allow only request 
 	if r.Method != http.MethodGet { 
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	} 
-	// Decode JSON request
-	var bathroomGet BathroomGet
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&bathroomGet); err != nil {
-		http.Error(w, "Invalid JSON input", http.StatusBadRequest)
-		return
-	}
-	defer r.Body.Close() 
 
 	bathroomMaps, err := getBathroomMapsFromFile()
 	if err!= nil { 
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
-	} 
+	}
+
 	jsonResponse, err := json.Marshal(bathroomMaps)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -444,7 +437,7 @@ func main() {
 	http.HandleFunc("/api/bathroom/write", bathroomWriteHandler)
 	http.HandleFunc("/api/bathroom/object/write", bathroomObjectWriteHandler)
 	http.HandleFunc("/api/bathroom/get/id", bathroomGetByIDHandler)
-	http.HandleFunc("/api/bathroom/get/maps", bathroomGetMaps)
+	http.HandleFunc("/api/bathroom/get/maps", bathroomGetHandler)
 
 	// Specify the directory containing the files
 	dir := "./images/"
@@ -455,10 +448,4 @@ func main() {
 
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
-
-
-	// bathroomdata := BathroomMap{
-	// 	ID: [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}},
-	// }
-
 }
