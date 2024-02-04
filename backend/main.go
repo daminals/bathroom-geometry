@@ -17,7 +17,6 @@ const bathroomsDB = "bathroomsDB.json"
 // VoronoiRequest represents the JSON input structure.
 type VoronoiRequest struct {
 	Matrix [][]int `json:"matrix"`
-	Size   int     `json:"size"`
 }
 
 func voronoiHandler(w http.ResponseWriter, r *http.Request) {
@@ -329,9 +328,6 @@ func getBathroomMapsByID(id int) (BathroomMapOutput, error) {
 	return BathroomMapOutput{}, errors.New("BathroomMap not found")
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
 
 // enableCORS is a middleware function to enable CORS for all origins
 func enableCORS(handler http.HandlerFunc) http.HandlerFunc {
@@ -358,7 +354,6 @@ func enableCORS(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 func main() {
-	http.HandleFunc("/", enableCORS(handler))
 	// Define the endpoint and handler function
 	http.HandleFunc("/api/voronoi", enableCORS(voronoiHandler))
 	http.HandleFunc("/api/bathroom/write", enableCORS(bathroomWriteHandler))
