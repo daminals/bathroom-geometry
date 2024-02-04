@@ -1,21 +1,29 @@
 <script lang="ts">
 	import { PUBLIC_MAPS_KEY } from '$env/static/public';
 	import { onMount } from 'svelte';
+	import { type Bathroom } from '$lib/types';
+	import EditBathroom from '$lib/editor/EditBathroom.svelte';
+	import { Input, Button } from 'flowbite-svelte';
+	import { SearchOutline } from 'flowbite-svelte-icons';
 
 	let container: HTMLDivElement;
 	let map: google.maps.Map;
-	let zoom = 17;
 	let marker1: google.maps.Marker;
 	let marker2: google.maps.Marker;
 	let rect: google.maps.Rectangle;
 
 	let mode = 'Search';
 	let nextId = 1;
+	let enableCreateGrid = false;
+
+	let grid: number[][];
+	let bathrooms: Map<number, Bathroom> = new Map();
+	let mapName = '';
 
 	// Handle map initialization
 	onMount(async () => {
 		map = new google.maps.Map(container, {
-			zoom
+			zoom: 17
 		});
 
 		// Create draggable markers
@@ -69,6 +77,7 @@
 							marker1.setPosition({ lat: location.lat() + 0.001, lng: location.lng() - 0.001 });
 							marker2.setPosition({ lat: location.lat() - 0.001, lng: location.lng() + 0.001 });
 							updateRect();
+							enableCreateGrid = true;
 						}
 					}
 				}
@@ -90,17 +99,10 @@
 		}
 	}
 
-	type Bathroom = {
-		id: number;
-		name: string;
-	};
-
 	// Handle go button click (draw grid)
-	let grid: number[][];
-	let bathrooms: Map<number, Bathroom> = new Map();
-	let rectangles: google.maps.Rectangle[] = [];
 	let markers: Map<number, google.maps.Marker> = new Map();
-	function handleGo() {
+	let rectangles: google.maps.Rectangle[] = [];
+	function handleCreateGrid() {
 		mode = 'Draw';
 		let bounds = rect.getBounds();
 		if (bounds) {
@@ -130,9 +132,9 @@
 			rect.setMap(null);
 
 			// Initialize grid
-			grid = Array(xCount)
+			grid = Array(yCount)
 				.fill(0)
-				.map(() => Array(yCount).fill(0));
+				.map(() => Array(xCount).fill(0));
 			for (let i = 0; i < yCount; i++) {
 				for (let j = 0; j < xCount; j++) {
 					const rectangle = new google.maps.Rectangle({
@@ -159,12 +161,12 @@
 	// Handle rectangle click
 	function handleRectClick(x: number, y: number) {
 		// Get the rectangle
-		const rectangle = rectangles[y * grid.length + x];
+		const rectangle = rectangles[y * grid[0].length + x];
 
 		// Check if in add mode
 		if (mode === 'Add') {
 			// Delete bathroom if exists
-			let id = grid[x][y];
+			let id = grid[y][x];
 			if (id > 0) {
 				// Remove bathroom
 				bathrooms.delete(id);
@@ -178,7 +180,7 @@
 				}
 
 				// Update grid
-				grid[x][y] = 0;
+				grid[y][x] = 0;
 				return;
 			}
 
@@ -186,10 +188,13 @@
 			id = nextId++;
 			bathrooms.set(id, {
 				id,
-				name: `Bathroom ${id}`
+				name: `Bathroom ${id}`,
+				gender: 'U',
+				accessible: false,
+				menstrualProducts: false
 			});
 			bathrooms = bathrooms;
-			grid[x][y] = id;
+			grid[y][x] = id;
 
 			// Create marker
 			const bounds = rectangle.getBounds();
@@ -206,7 +211,7 @@
 		}
 
 		// Get current state
-		const filled = grid[x][y] === -1;
+		const filled = grid[y][x] === -1;
 
 		if (filled) {
 			// Unfill the rectangle
@@ -214,15 +219,32 @@
 				fillColor: 'white',
 				fillOpacity: 0.1
 			});
-			grid[x][y] = 0;
+			grid[y][x] = 0;
 		} else {
 			// Fill the rectangle
 			rectangle.setOptions({
 				fillColor: 'black',
 				fillOpacity: 1
 			});
-			grid[x][y] = -1;
+			grid[y][x] = -1;
 		}
+	}
+
+	// Handle save button click
+	function handleSave() {
+		// Convert the data to JSON
+		const data = {
+			name: mapName,
+			coordinates: [
+				rect.getBounds()?.getNorthEast().toJSON(),
+				rect.getBounds()?.getSouthWest().toJSON()
+			],
+			grid: grid,
+			bathrooms: Array.from(bathrooms.values())
+		};
+
+		const json = JSON.stringify(data);
+		console.log(json);
 	}
 </script>
 
@@ -235,48 +257,36 @@
 	</script>
 </svelte:head>
 
-<div class="container">
-	<div class="header">
+<div class="h-full w-screen flex flex-col">
+	<div class="flex justify-between p-2 bg-primary-800">
 		<form on:submit={handleSubmit}>
-			<input type="text" placeholder="Search for a place" />
-			<button type="submit">Search</button>
+			<Input type="text" placeholder="Search for a place">
+				<SearchOutline slot="left" />
+			</Input>
 		</form>
-		<div>Mode: {mode}</div>
-		{#if mode === 'Search'}
-			<button on:click={handleGo}>Go</button>
-		{:else}
-			<button on:click={() => (mode = mode === 'Draw' ? 'Add' : 'Draw')}>
-				Toggle Draw / Add Mode
-			</button>
+		{#if mode === 'Search' && enableCreateGrid}
+			<Button on:click={handleCreateGrid}>Create Grid</Button>
+		{:else if mode === 'Draw'}
+			<Button on:click={() => (mode = 'Add')}>Add Bathrooms</Button>
+		{:else if mode === 'Add'}
+			<Button on:click={() => (mode = 'Draw')}>Draw Walls</Button>
 		{/if}
 	</div>
-	<div bind:this={container} class="map"></div>
-	<div>
-		<div>
-			{#each Array.from(bathrooms.values()) as bathroom}
-				<div>{bathroom.name}</div>
-			{/each}
+	<div class="h-0 w-full flex-grow flex">
+		<div class="h-full w-3/5 flex flex-col">
+			<div bind:this={container} class="h-0 w-full flex-grow" />
+			<div class="p-2 text-center bg-slate-100">Current Mode: {mode}</div>
+		</div>
+		<div class="h-full w-2/5 flex flex-col bg-slate-200">
+			<div class="h-0 flex-grow flex flex-col gap-2 overflow-y-scroll p-2">
+				{#each Array.from(bathrooms.values()) as bathroom}
+					<EditBathroom {bathroom} />
+				{/each}
+			</div>
+			<div class="flex justify-center p-2 gap-2">
+				<Input type="text" placeholder="Map Name" bind:value={mapName} />
+				<Button on:click={handleSave}>Save</Button>
+			</div>
 		</div>
 	</div>
 </div>
-
-<style>
-	:global(body) {
-		margin: 0;
-	}
-	.header {
-		display: flex;
-		justify-content: center;
-	}
-	.container {
-		width: 100vw;
-		height: 100vh;
-		display: flex;
-		flex-direction: column;
-	}
-	.map {
-		width: 100%;
-		height: 0%;
-		flex-grow: 1;
-	}
-</style>
