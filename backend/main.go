@@ -446,6 +446,5 @@ func main() {
 	// Create a handler function to serve files with modified URLs
 	http.Handle("/images/", http.StripPrefix("/images", fileServer))
 
-
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
