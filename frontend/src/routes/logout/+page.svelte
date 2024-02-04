@@ -1,20 +1,27 @@
 <script lang="ts">
     // Import the Header, Sidebar, and Gallery components
-    import Header from '../lib/Header.svelte';
-    import SidebarGallery from '../lib/SidebarGallery.svelte';
-    import { usernameStore } from '../lib/ratingsStore';
-    import { onMount } from 'svelte';
+    import Header from '../../lib/Header.svelte';
+    import Logout from '../../lib/Logout.svelte';
 
-    let username: string | null = null;
+    import { usernameStore, logoutStatus} from '../../lib/ratingsStore';
+    let username: string | null = null; // 
+    
+  
+usernameStore.subscribe(value => {
+    username = value;
+});
 
-    usernameStore.subscribe(value => {
-        username = value;
-    });
+
+
+console.log(username)
 </script>
 
-<main class='h-screen w-screen flex flex-col'>
+
+<main>
+    <!-- Your main content goes here -->
+  
     <Header />
-    <nav>
+     <nav>
         <a href="/" class:selectedLink={window.location.pathname === '/'}>Gallery</a>
         {#if username !== ""}
             <a href="/logout" class:selectedLink={window.location.pathname === '/logout'}>Logout</a>
@@ -26,19 +33,19 @@
             <a href="/signup" class:selectedLink={window.location.pathname === '/signup'}>Sign Up</a>
         {/if}
     </nav>
-    <div class="h-0 flex-grow w-full flex">
-        <div class="bg-[#333] text-white w-64">
-            <SidebarGallery />
+    <div style="margin-top: 20px;">
+
+            <Logout />
         </div>
-    </div>
+
+    
 </main>
 
 <style>
-     /* Style for the navigation links */
-     :global(body) {
+	:global(body) {
 		margin: 0;
 	}
-
+    /* Style for the navigation links */
     nav {
         background-color: #333; /* Dark background color */
         padding: 10px 0; /* Add padding to the top and bottom */
@@ -53,7 +60,10 @@
         transition: background-color 0.3s ease; /* Smooth transition on hover */
     }
 
-    nav a:hover,
+    nav a:hover {
+        background-color: #555; /* Darker background color on hover */
+    }
+
     nav a.selectedLink {
         background-color: #555; /* Darker background color on hover */
     }
