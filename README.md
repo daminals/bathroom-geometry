@@ -9,8 +9,12 @@ As residents of NYC, we've all faced the challenge of locating clean and accessi
 
 Additionally, our shared experience with the Computational Geometry class here at SBU has made us excited to try our hand at implementing what we've learned in class. 
 
-# Challenges & Lessons   
-SBU Bathroom Finder was an interesting and tall project for us to tackle as we didn't have much experience in Golang or Svelte and we had never done any pathfinding or projects that required complex distance calculations before. Doing this in 24 hours didn't make it much easier. However, as a result, we learned a lot and had fun working on the project! Here are some highlights of our challenges and what we learned: 
+# What it Does
+Using A* and Point Sampling algorithms, the SBU Bathroom Finder enables users to locate the nearest restroom by generating a color-coded grid. On the Gallery and Viewer pages, users encounter a grid displaying a Voronoi diagram, where bathrooms serve as hotspots, each denoted by a unique color to signify proximity. Meanwhile, walls are delineated in black.
+
+After either logging in or signing up, users unlock even more features. For example, they gain the ability to scroll on Google Maps, insert their own grid, and mark all walls and bathrooms. Then, users can press a "compute geometry" button to generate a Voronoi diagram for an entirely new page. Users can also rate existing restrooms on Stony Brook's campus based on accessibility, cleanliness, and other features. Finally, they can log out when they're finished using the application.
+
+# How we Built it
 
 ## Backend  
 Deciding our implementation and what exactly we wanted to achieve was pretty tough. We floated around multiple ideas but eventually settled on creating a Voronoi diagram of some sorts. Thus, our extensive research began on implementations of Voronoi diagrams that had already been accomplished. 
@@ -19,28 +23,43 @@ The problem was though, that the Voronoi diagram implementations we found in Gol
 
 This first led us to the [Jump Flooding Algorithm](https://en.wikipedia.org/wiki/Jump_flooding_algorithm) and we watched [this](https://www.youtube.com/watch?v=AT0jTugdi0M) excellent youtube video explaining the concept, but while this algorithm was cool to learn about, it was out of the scope of this project to create a customized Jump Flooding Algorithm that would account for obstacles. 
 
-If we had more time, we would have written a Jump Flooding Algorithm with the following customizations, based on a few stack overflow posts (notably [this one](https://stackoverflow.com/questions/73255352/creating-a-voroni-diagram-with-arbitrary-boundaries)):
-  - if the tile is colored with the boundary color, discard consideration for recoloring automatically
-  - implement A* for the dist() check which respects the walls
-
 We settled on implementing the Voronoi diagram in an unconventional but more naive approach, taking advantage of A* pathfinding, Distance Hueristics, and some clever splitting of our input into tiles represented by a 2D array.  
 
 With the A* pathfinding algorithm we had to implement our own version as many Golang implementations wanted to take in a string representation which would not be compatible with creating Voronoi diagrams. 
 
-Implementing our own versions of these algorithms was quite difficult as we had no experience coding these before, but eventually we got an approximation of the Voronoi diagram which is pretty close to what we wanted.
-
-Overall, we did end up overcoming most of the challenges we faced in our Backend, though this doesn't mean it's perfect and further optimizations/changes will be mentioned in future sections. So, for now, let's move onto the Frontend challenges. 
+Overall, we did end up overcoming most of the challenges we faced in our Backend, though this doesn't mean it's perfect and further optimizations/changes will be mentioned in future sections. So, for now, let's move onto the Frontend challenges.
 
 ## Frontend
+For the frontend of the SBU Bathroom Finder, we utilized Svelte as our primary framework. Svelte is a modern JavaScript framework that focuses on performance and simplicity. We were able to build a reactive user interactive as a result, with various pages enabling the user to login, sign up, view a gallery, edit, and log out. Users are also able to complete forms and interact with images and grids. Grids are fully interactive, with users being able to mark both walls and restrooms.
 
-# Where do we go from here?   
+To make the map interactions fully possible, we also used the Google Maps API. This allows the Voronoi diagrams created by the backend to be displayed as a grid over a map of Stony Brook's campus. Users are also able to scroll through Google Maps in order to pick a location for a new bathroom grid.
 
-When it comes to the future of SBU Bathroom Finder, there are several things that we wish we could've done if not for the time limit of 24 hours. I/O to JSON Files and loading previously made maps could be made more efficient with the use of a database like MongoDB or SQL. In the use of a database we could also take advantage of showing many more pre-made maps that are contributed from the community. 
+TypeScript was used to store user information from signing up, logging in and completing forms.
 
-In terms of our A* implmenetation and how we created the Voronoi there may be other data structures or algorithms we could've explored to optimize the time and space complexity, but our implementation runs quite well regardless.
+# Challenges we ran into
+SBU Bathroom Finder was an interesting and tall project for us to tackle as we didn't have much experience in Golang or Svelte and we had never done any pathfinding or projects that required complex distance calculations before. Doing this in 24 hours didn't make it much easier. Implementing our own versions of the A* and Point Sampling algorithm was quite difficult as we had no experience coding these before, but eventually we got an approximation of the Voronoi diagram which is pretty close to what we wanted.  
 
-# Technical Details 
+For reference here's what our code was outputting when we were having difficulties and it broke: 
+<img src="https://github.com/daminals/bathroom-geometry/assets/107337676/bc2fe815-447c-467a-a986-675fd2754aba" width="600" height="600">
 
 
+Here's what it was outputting once it was fixed:  
+
+<img src="https://cdn.discordapp.com/attachments/1181082647833890876/1203723383288762368/Screenshot_2024-02-04_at_10.26.55_AM.png?ex=65d221c2&is=65bfacc2&hm=9a90f6dc25f6910add98bda01c167e7b06eac275b6136a9f7ac147946bca9804&" width="600" height="600">
 
 
+# Accomplishments that we're proud of
+Our team is proud that we made finding bathrooms more accessible at Stony Brook University. We are also happy we got to implement what we learned in our Computational Geometry class in a software project.
+
+# What we learned
+No one on our team had experience with Svelte before, so we all familiarized oursevles with a new JavaScript framework. We also all used the Google Maps API for the first time during this project, so we learned how to integrate this google both into a Svelte frontend and our Golang backend.
+We also learned how to implement an A* star and point sampling algorithms into our backend.
+
+# What's next for SBU Bathroom Finder
+We want to implement a more largescale bathroom finder, that is easily adaptable to metropolitan and campus areas. We also want to improve user functionality by having an improved rating experience that is better integrated with our main Gallery and Viewer.
+
+If we had more time, we would have written a Jump Flooding Algorithm with the following customizations, based on a few stack overflow posts (notably [this one](https://stackoverflow.com/questions/73255352/creating-a-voroni-diagram-with-arbitrary-boundaries)):
+  - if the tile is colored with the boundary color, discard consideration for recoloring automatically
+  - implement A* for the dist() check which respects the walls
+
+Also, in the future, we would like to set up a proper database like MongoDB or SQL. Overall, making community sourced maps more accessible and faster to access as the project scales.  
