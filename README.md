@@ -62,4 +62,4 @@ If we had more time, we would have written a Jump Flooding Algorithm with the fo
   - if the tile is colored with the boundary color, discard consideration for recoloring automatically
   - implement A* for the dist() check which respects the walls
 
-Also, in the future, we would like to set up a proper database in the future like MongoDB or SQL. Making community sourced maps more accessible and faster to access as the project scales.  
+Also, in the future, we would like to set up a proper database like MongoDB or SQL. Overall, making community sourced maps more accessible and faster to access as the project scales.  
