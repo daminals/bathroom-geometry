@@ -17,7 +17,8 @@
 	let enableCreateGrid = false;
 
 	let grid: number[][];
-	let rectangles: google.maps.Rectangle[] = [];
+	let bathrooms: Map<number, Bathroom> = new Map();
+	let mapName = '';
 
 	// Handle map initialization
 	onMount(async () => {
@@ -99,8 +100,8 @@
 	}
 
 	// Handle go button click (draw grid)
-	let bathrooms: Map<number, Bathroom> = new Map();
 	let markers: Map<number, google.maps.Marker> = new Map();
+	let rectangles: google.maps.Rectangle[] = [];
 	function handleCreateGrid() {
 		mode = 'Draw';
 		let bounds = rect.getBounds();
@@ -131,9 +132,9 @@
 			rect.setMap(null);
 
 			// Initialize grid
-			grid = Array(xCount)
+			grid = Array(yCount)
 				.fill(0)
-				.map(() => Array(yCount).fill(0));
+				.map(() => Array(xCount).fill(0));
 			for (let i = 0; i < yCount; i++) {
 				for (let j = 0; j < xCount; j++) {
 					const rectangle = new google.maps.Rectangle({
@@ -160,12 +161,12 @@
 	// Handle rectangle click
 	function handleRectClick(x: number, y: number) {
 		// Get the rectangle
-		const rectangle = rectangles[y * grid.length + x];
+		const rectangle = rectangles[y * grid[0].length + x];
 
 		// Check if in add mode
 		if (mode === 'Add') {
 			// Delete bathroom if exists
-			let id = grid[x][y];
+			let id = grid[y][x];
 			if (id > 0) {
 				// Remove bathroom
 				bathrooms.delete(id);
@@ -179,7 +180,7 @@
 				}
 
 				// Update grid
-				grid[x][y] = 0;
+				grid[y][x] = 0;
 				return;
 			}
 
@@ -193,7 +194,7 @@
 				menstrualProducts: false
 			});
 			bathrooms = bathrooms;
-			grid[x][y] = id;
+			grid[y][x] = id;
 
 			// Create marker
 			const bounds = rectangle.getBounds();
@@ -210,7 +211,7 @@
 		}
 
 		// Get current state
-		const filled = grid[x][y] === -1;
+		const filled = grid[y][x] === -1;
 
 		if (filled) {
 			// Unfill the rectangle
@@ -218,15 +219,32 @@
 				fillColor: 'white',
 				fillOpacity: 0.1
 			});
-			grid[x][y] = 0;
+			grid[y][x] = 0;
 		} else {
 			// Fill the rectangle
 			rectangle.setOptions({
 				fillColor: 'black',
 				fillOpacity: 1
 			});
-			grid[x][y] = -1;
+			grid[y][x] = -1;
 		}
+	}
+
+	// Handle save button click
+	function handleSave() {
+		// Convert the data to JSON
+		const data = {
+			name: mapName,
+			coordinates: [
+				rect.getBounds()?.getNorthEast().toJSON(),
+				rect.getBounds()?.getSouthWest().toJSON()
+			],
+			grid: grid,
+			bathrooms: Array.from(bathrooms.values())
+		};
+
+		const json = JSON.stringify(data);
+		console.log(json);
 	}
 </script>
 
@@ -265,8 +283,9 @@
 					<EditBathroom {bathroom} />
 				{/each}
 			</div>
-			<div class="flex justify-center p-2">
-				<Button on:click={() => console.log(bathrooms)}>Save</Button>
+			<div class="flex justify-center p-2 gap-2">
+				<Input type="text" placeholder="Map Name" bind:value={mapName} />
+				<Button on:click={handleSave}>Save</Button>
 			</div>
 		</div>
 	</div>
