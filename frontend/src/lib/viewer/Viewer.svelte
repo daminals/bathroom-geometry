@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { type Bathroom } from '$lib/types';
 	import ViewBathroom from '$lib/viewer/ViewBathroom.svelte';
-	import { Input } from 'flowbite-svelte';
+	import { Button, Input } from 'flowbite-svelte';
 	import { PUBLIC_API_ADDRESS } from '$env/static/public';
 
 	let container: HTMLDivElement;
@@ -79,7 +79,7 @@
 
 		if (value && map) {
 			const json = JSON.stringify({ ID: parseInt(value) });
-			const res = await fetch(`${PUBLIC_API_ADDRESS}/bathroom/get/maps/id`, {
+			const res = await fetch(`${PUBLIC_API_ADDRESS}/bathroom/maps/id`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -150,6 +150,40 @@
 			}
 		}
 	}
+
+	// Handle compute geometry
+	type VoronoiResponse = number[][]
+	async function handleCompute() {
+		if (map) {
+			const json = JSON.stringify({ matrix: grid });
+			const res = await fetch(`${PUBLIC_API_ADDRESS}/voronoi`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: json
+			});
+			const matrix = await res.json() as VoronoiResponse;
+			console.log(matrix);
+			// Update rectangles with new colors
+			for (let i = 0; i < matrix.length; i++) {
+				for (let j = 0; j < matrix[i].length; j++) {
+					let id = matrix[i][j];
+					let color = 'white';
+					if (id > 0) {
+						color = bathrooms.get(id)?.color || 'white';
+					}
+					if (id == -1) {
+						color = 'black';
+					}
+					rectangles[i * matrix[i].length + j].setOptions({
+						fillColor: color,
+						fillOpacity: color == 'white' ? 0.0 : 0.8
+					});
+				}
+			}
+		}
+	}
 </script>
 
 <div class="flex h-full w-screen flex-col">
@@ -167,6 +201,9 @@
 				{#each Array.from(bathrooms.values()) as bathroom}
 					<ViewBathroom {bathroom} />
 				{/each}
+			</div>
+			<div>
+				<Button on:click={handleCompute}>Compute Geometry</Button>
 			</div>
 		</div>
 	</div>
