@@ -9,7 +9,6 @@
     <Header />
     <nav>
         <a href="/">Gallery</a>
-        <a href="/new">New</a>
         <a href="/edit">Edit</a>
         <a href="/rate">Rate</a>
     </nav>

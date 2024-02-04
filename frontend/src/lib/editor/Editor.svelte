@@ -257,7 +257,7 @@
 	</script>
 </svelte:head>
 
-<div class="h-screen w-screen flex flex-col">
+<div class="h-full w-screen flex flex-col">
 	<div class="flex justify-between p-2 bg-primary-800">
 		<form on:submit={handleSubmit}>
 			<Input type="text" placeholder="Search for a place">
