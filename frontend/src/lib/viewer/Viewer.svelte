@@ -156,6 +156,7 @@
 	async function handleCompute() {
 		if (map) {
 			const json = JSON.stringify({ matrix: grid });
+			console.log(json);
 			const res = await fetch(`${PUBLIC_API_ADDRESS}/voronoi`, {
 				method: 'POST',
 				headers: {
