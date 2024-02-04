@@ -1,8 +1,7 @@
 <script>
 	// Import the Header, Sidebar, and Gallery components
 	import Header from '../../lib/Header.svelte';
-	import SidebarEdit from '../../lib/SidebarEdit.svelte';
-	import Editor from '$lib/editor/Editor.svelte';
+	import Viewer from '$lib/viewer/Viewer.svelte';
 </script>
 
 <main class="h-screen w-screen flex flex-col">
@@ -16,7 +15,7 @@
 		<a href="/viewer">Viewer</a>
 	</nav>
 	<div class="h-0 flex-grow w-full flex">
-		<Editor />
+		<Viewer />
 	</div>
 </main>
 
