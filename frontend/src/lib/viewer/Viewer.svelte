@@ -7,78 +7,21 @@
 
 	let container: HTMLDivElement;
 	let map: google.maps.Map;
-
-	// {"name":"Stony Brook","coordinates":[{"lat":40.909119,"lng":-73.1194032},{"lat":40.907119,"lng":-73.1214032}],"bathrooms":[]}
 	let grid: number[][];
 	let bathrooms: Map<number, Bathroom> = new Map();
 	let mapName = '';
 
+	export let id: number;
+
 	// Handle map initialization
+	let markers: Map<number, google.maps.Marker> = new Map();
+	let rectangles: google.maps.Rectangle[] = [];
 	onMount(async () => {
 		map = new google.maps.Map(container, {
 			zoom: 17
 		});
-	});
 
-	type BathroomMap = {
-		name: string;
-		coordinates: [
-			{
-				lat: number;
-				lng: number;
-			},
-			{
-				lat: number;
-				lng: number;
-			}
-		];
-		grid: number[][];
-		bathrooms: Bathroom[];
-	};
-
-	function hslToHex(h: number, s: number, l: number) {
-		let r, g, b;
-
-		if (s === 0) {
-			r = g = b = l; // achromatic
-		} else {
-			const hue2rgb = (p: number, q: number, t: number) => {
-				if (t < 0) t += 1;
-				if (t > 1) t -= 1;
-				if (t < 1 / 6) return p + (q - p) * 6 * t;
-				if (t < 1 / 2) return q;
-				if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-				return p;
-			};
-
-			const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-			const p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1 / 3);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1 / 3);
-		}
-
-		// Convert RGB to Hex
-		const toHex = (x: number) => {
-			const hex = Math.round(x * 255).toString(16);
-			return hex.length === 1 ? '0' + hex : hex;
-		};
-
-		const hexColor = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-		return hexColor.toUpperCase();
-	}
-
-	// Handle ID input
-	let markers: Map<number, google.maps.Marker> = new Map();
-	let rectangles: google.maps.Rectangle[] = [];
-	async function handleSubmit(event: Event) {
-		event.preventDefault();
-		const form = event.target as HTMLFormElement;
-		const input = form.querySelector('input') as HTMLInputElement;
-		const value = input.value;
-
-		if (value && map) {
-			const json = JSON.stringify({ ID: parseInt(value) });
+		const json = JSON.stringify({ ID: id });
 			const res = await fetch(`${PUBLIC_API_ADDRESS}/bathroom/maps/id`, {
 				method: 'POST',
 				headers: {
@@ -149,6 +92,54 @@
 				}
 			}
 		}
+	);
+
+	type BathroomMap = {
+		name: string;
+		coordinates: [
+			{
+				lat: number;
+				lng: number;
+			},
+			{
+				lat: number;
+				lng: number;
+			}
+		];
+		grid: number[][];
+		bathrooms: Bathroom[];
+	};
+
+	function hslToHex(h: number, s: number, l: number) {
+		let r, g, b;
+
+		if (s === 0) {
+			r = g = b = l; // achromatic
+		} else {
+			const hue2rgb = (p: number, q: number, t: number) => {
+				if (t < 0) t += 1;
+				if (t > 1) t -= 1;
+				if (t < 1 / 6) return p + (q - p) * 6 * t;
+				if (t < 1 / 2) return q;
+				if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+				return p;
+			};
+
+			const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+			const p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1 / 3);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1 / 3);
+		}
+
+		// Convert RGB to Hex
+		const toHex = (x: number) => {
+			const hex = Math.round(x * 255).toString(16);
+			return hex.length === 1 ? '0' + hex : hex;
+		};
+
+		const hexColor = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+		return hexColor.toUpperCase();
 	}
 
 	// Handle compute geometry
@@ -189,9 +180,7 @@
 
 <div class="flex h-full w-screen flex-col">
 	<div class="bg-primary-800 flex justify-between p-2">
-		<form on:submit={handleSubmit}>
-			<Input type="text" placeholder="Enter ID"></Input>
-		</form>
+		<h1 class="text-white text-2xl font-medium">{mapName}</h1>
 	</div>
 	<div class="flex h-0 w-full flex-grow">
 		<div class="flex h-full w-3/5 flex-col">

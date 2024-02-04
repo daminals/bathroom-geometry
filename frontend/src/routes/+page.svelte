@@ -1,11 +1,37 @@
 <script lang="ts">
 	// Import the Header, Sidebar, and Gallery components
 	import Header from '../lib/Header.svelte';
-	import SidebarGallery from '../lib/SidebarGallery.svelte';
 	import { usernameStore } from '../lib/ratingsStore';
 	import { onMount } from 'svelte';
+	import { PUBLIC_API_ADDRESS } from '$env/static/public';
+	import { Button, Card } from 'flowbite-svelte';
+	import { ArrowRightOutline } from 'flowbite-svelte-icons';
+    import { viewStore } from '$lib/viewStore';
+    import { goto } from '$app/navigation';
 
 	let username: string | null = null;
+
+	type Map = {
+		ID: number;
+		name: string;
+	};
+	let maps: Map[] = [];
+
+	onMount(async () => {
+		// Get maps from the server
+		const res = await fetch(`${PUBLIC_API_ADDRESS}/bathroom/maps`);
+		const serverMaps = await res.json();
+		maps = serverMaps;
+        console.log(maps);
+	});
+
+    function handleView(id: number) {
+        // Set the view id
+        viewStore.set(id);
+
+        // Redirect to the viewer
+        goto('/viewer');
+    }
 
 	usernameStore.subscribe((value) => {
 		username = value;
@@ -16,19 +42,33 @@
 	<Header />
 	<nav>
 		<a href="/">Gallery</a>
+		<a href="/viewer">Viewer</a>
 		{#if username !== ''}
 			<a href="/logout">Logout</a>
 			<a href="/editor">Editor</a>
-			<a href="/viewer">Viewer</a>
 			<a href="/rate">Rate</a>
 		{:else}
 			<a href="/login">Login</a>
 			<a href="/signup">Sign Up</a>
 		{/if}
 	</nav>
-	<div class="flex h-0 w-full flex-grow">
-		<div class="w-64 bg-[#333] text-white">
-			<SidebarGallery />
+	<div class="flex w-full flex-grow justify-center flex-col">
+		<div class="h-fit flex gap-4 justify-center">
+			{#each maps as map}
+				<Card class="flex-shrink">
+					<h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+						{map.name}
+					</h5>
+					<p class="mb-3 font-normal leading-tight text-gray-700 dark:text-gray-400">
+						Bathroom map
+					</p>
+					<Button class="w-fit" on:click={() => {
+                        handleView(map.ID)
+                    }}>
+						View <ArrowRightOutline class="ms-2 h-3.5 w-3.5 text-white" />
+					</Button>
+				</Card>
+			{/each}
 		</div>
 	</div>
 </main>
