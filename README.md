@@ -23,12 +23,16 @@ We settled on implementing the Voronoi diagram in an unconventional way, taking 
 
 With the A* pathfinding algorithm we had to implement our own version as many Golang implementations wanted to take in a string representation which would not be compatible with creating Voronoi diagrams. 
 
-Implementing our own versions of these algorithms was quite difficult as we had no experience coding these before, but eventually it became smooth sailing until we had to deal with coding endpoints for the part of the team working on the frontend. The I/O to JSON files and their formatting was a bit tricky to decide on and figure out in Golang as the sytax was quite different from languages like python or java. 
+Implementing our own versions of these algorithms was quite difficult as we had no experience coding these before, but eventually it worked until we had to deal with coding endpoints for the part of the team working on the frontend. The I/O to JSON files and their formatting was a bit tricky to decide on and figure out in Golang as the sytax was quite different from languages like python or java. 
 
-Overall, we did end up overcoming most of the challenges we faced in our Backend, though this doesn't mean it's perfect and further optimizations/changes will be mentioned in future sections. So, for now, let's move onto the Frontend challenges. 
+Overall, we did end up overcoming most of the challenges we faced in our Backend, though this doesn't mean it's perfect, our A* implementation is a very good approximation but not exact, and further optimizations/changes will be mentioned in future sections. So, for now, let's move onto the Frontend challenges.  
+
 ## Frontend
 
-# Where do we go from here? 
+# Where do we go from here?  
+When it comes to the future of SBU Bathroom Finder, there are several things that we wish we could've done if not for the time limit of 24 hours. I/O to JSON Files and loading previously made maps could be made more efficient with the use of a database like MongoDB or SQL. There may be other data structures or algorithms we 
+
+
 
 # Technical Details 
 
