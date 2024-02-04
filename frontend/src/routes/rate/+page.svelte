@@ -1,7 +1,6 @@
 <script lang="ts">
     // Import the Header, Sidebar, and Gallery components
     import Header from '../../lib/Header.svelte';
-    import Sidebar from '../../lib/Sidebar.svelte';
     import RatePage from '../../lib/RatePage.svelte'; // Adjust the path accordingly
     import { usernameStore} from '../../lib/ratingsStore';
     let username: string | null = null; // 
@@ -29,9 +28,7 @@ console.log(username)
         {/if}
     </nav>
     <div class="h-0 flex-grow w-full flex">
-        <div class="bg-[#333] text-white w-64">
-            <Sidebar />
-        </div>
+
         <RatePage /> <!-- Include the Gallery component -->
     </div>
     
@@ -59,8 +56,5 @@ console.log(username)
     nav a:hover {
         background-color: #555; /* Darker background color on hover */
     }
-    nav a.selectedLink {
-        background-color: #555; /* Darker background color on hover */
-    }
-   
+  
 </style>

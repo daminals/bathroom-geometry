@@ -1,168 +1,163 @@
 <script lang="ts">
-	import Rate from './Rate.svelte';
-	import { onMount } from 'svelte';
-	import { comments} from './ratingsStore';
-	
+    import Rate from './Rate.svelte';
+    import { onMount } from 'svelte';
+    import { comments, accessibilityRating, cleanRating, menstrualRating, overallRating } from './ratingsStore';
 
-	let showForm = false;
-	let currentIndex = 0;
-	let commentsData: { text: string; user: string }[] = []; // Initialize commentsData
+    let showForm = false;
+    let currentIndex = 0;
+    let commentsData: { text: string; user: string }[] = [];
 
-	let images = [
-		{ name: 'Image 1', src: 'grid.jpg' },
-		{ name: 'Image 2', src: 'grid.jpg' }
-	];
+    let images = [
+        { name: 'Jasmine', src: 'jasmine.jpg' },
+        { name: 'SAC', src: 'sac.jpg' }
+    ];
 
-	function prevImage() {
-		currentIndex = (currentIndex - 1 + images.length) % images.length;
-	}
+    function prevImage() {
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+    }
 
-	function nextImage() {
-		currentIndex = (currentIndex + 1) % images.length;
-	}
+    function nextImage() {
+        currentIndex = (currentIndex + 1) % images.length;
+    }
 
-	function handleRate() {
-		showForm = !showForm;
-	}
+    function handleRate() {
+        showForm = !showForm;
+    }
 
-	onMount(() => {
-    const unsubscribe = comments.subscribe((value) => {
-        // Update commentsData with the latest comments
-        commentsData = value;
-        console.log('Received comments:', commentsData); // Log commentsData to see if it's updating
+    onMount(() => {
+        const unsubscribe = comments.subscribe((value) => {
+            commentsData = value;
+        });
+        return unsubscribe;
     });
-
-    // Unsubscribe from the store to avoid memory leaks
-    return unsubscribe;
-});
-
-
-
-
-
 </script>
 
 <div class="gallery-container">
-	{#if !showForm}
-		<div class="gallery">
-			<h2>{images[currentIndex].name}</h2>
-			{#each images as { src }, index}
-				<img
-					{src}
-					alt={images[currentIndex].name}
-					class="gallery-image"
-					style={index === currentIndex ? 'display: block;' : 'display: none;'}
-				/>
-			{/each}
-			<div class="nav-buttons">
-				<button class="prev-btn" on:click={prevImage}>&lt;</button>
-				<button class="next-btn" on:click={nextImage}>&gt;</button>
-				<button class="b" on:click={handleRate}>Rate</button>
-			</div>
-		</div>
-		<div class="comments-section">
+    {#if !showForm}
+        <div class="gallery">
+            <h1>{images[currentIndex].name}</h1>
+            <div class="ratings-container">
+                <h2>Ratings</h2>
+                <p>Accessibility Rating: {$accessibilityRating.toFixed(0)}</p>
+                <p>Clean Rating: {$cleanRating.toFixed(0)}</p>
+                <p>Menstrual Rating: {$menstrualRating.toFixed(0)}</p>
+                <p>Overall Rating: {$overallRating.toFixed(0)}</p>
+            </div>
+            {#each images as { src }, index}
+                <img
+                    {src}
+                    alt={images[currentIndex].name}
+                    class="gallery-image"
+                    style={index === currentIndex ? 'display: block;' : 'display: none;'}
+                />
+            {/each}
+            <div class="nav-buttons">
+                <button class="prev-btn" on:click={prevImage}>&lt;</button>
+                <button class="next-btn" on:click={nextImage}>&gt;</button>
+                <button class="rate-btn" on:click={handleRate}>Rate</button>
+            </div>
+        </div>
+        <div class="comments-section">
             <h3>Comments</h3>
             {#if commentsData.length > 0}
                 {#each commentsData as comment}
                     <div class="comment">
                         <p>{comment.text}</p>
-                        <!-- Display comment text -->
                     </div>
                 {/each}
             {:else}
                 <p>No comments available</p>
             {/if}
         </div>
-        
-	{/if}
+    {/if}
 
-	<!-- Rating Form -->
-	{#if showForm}
-		<div class="rate-form">
-			<Rate />
-		</div>
-	{/if}
+    {#if showForm}
+        <div class="rate-form">
+            <Rate />
+        </div>
+    {/if}
 </div>
 
 <style>
-	.gallery-container {
-		font-family: 'Roboto', sans-serif;
-		position: relative;
-		max-width: 600px;
-		margin: 0 auto;
-		overflow: hidden; /* Hide overflow content */
-	}
 
-	.gallery {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
+h1 {
+	font-size: 20px;
+	font-weight: bold;
+}
 
-	.gallery-image {
-		width: 300px;
-		height: 200px;
-		object-fit: cover;
-		margin-bottom: 20px;
-	}
+h2 {
+	font-size: 18px;
+}
+    /* Modern and Stylish CSS Styles */
+    .gallery-container {
+        font-family: 'Roboto', sans-serif;
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto;
+		
+    }
 
-	.nav-buttons {
-		margin-top: 10px;
-		text-align: center;
-	}
+    .gallery {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-	.prev-btn,
-	.next-btn {
-		background: transparent;
-		border: none;
-		font-size: 20px;
-		color: #000;
-		cursor: pointer;
-		outline: none;
-	}
+    .ratings-container {
+        margin-bottom: 20px;
+    }
 
-	.prev-btn {
-		margin-right: 10px;
-	}
+    .gallery-image {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
 
-	.next-btn {
-		margin-left: 10px;
-	}
+    .nav-buttons {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+    }
 
-	.rate-form {
-		margin-top: 20px;
-	}
+    .prev-btn,
+    .next-btn,
+    .rate-btn {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 10px 20px;
+        margin: 0 10px;
+        transition: background-color 0.3s ease;
+    }
 
-	.b {
-		display: inline-block;
-		padding: 10px 20px;
-		background-color: #880404;
-		color: #fff;
-		border: none;
-		border-radius: 20px;
-		font-size: 16px;
-		font-weight: bold;
-		text-transform: uppercase;
-		cursor: pointer;
-		transition: background-color 0.3s ease;
-	}
+    .prev-btn:hover,
+    .next-btn:hover,
+    .rate-btn:hover {
+        background-color: #45a049;
+    }
 
-	.b:hover {
-		background-color: #460706;
-	}
+    .comments-section {
+        margin-top: 20px;
+    }
 
-	.b:active {
-		transform: translateY(2px);
-	}
+    .comment {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
 
-	.comments-section {
-		margin-top: 20px;
-	}
-
-	.comment {
-		border: 1px solid #ccc;
-		padding: 10px;
-		margin-bottom: 10px;
-		border-radius: 5px;
-	}
+    .comment p {
+        margin: 0;
+    }
 </style>
