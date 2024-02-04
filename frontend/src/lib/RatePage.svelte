@@ -2,9 +2,11 @@
 	import Rate from './Rate.svelte';
 	import { onMount } from 'svelte';
 	import { comments } from './ratingsStore';
+
 	let showForm = false;
 	let currentIndex = 0;
-    let commentsData: Comment[] = [];
+	let commentsData: { text: string; user: string }[] = []; // Initialize commentsData
+
 	let images = [
 		{ name: 'Image 1', src: 'grid.jpg' },
 		{ name: 'Image 2', src: 'grid.jpg' }
@@ -21,12 +23,11 @@
 	function handleRate() {
 		showForm = !showForm;
 	}
+
 	onMount(() => {
 		const unsubscribe = comments.subscribe((value) => {
-			let commentsData: {
-				text: string;
-				user: string;
-			}[]; // Update commentsData with the latest comments
+			// Update commentsData with the latest comments
+			commentsData = value;
 		});
 
 		// Unsubscribe from the store to avoid memory leaks
@@ -57,7 +58,8 @@
 			{#if commentsData.length > 0}
 				{#each commentsData as comment}
 					<div class="comment">
-						<p>{comment}</p>
+						<p>{comment.text}</p>
+						<!-- Display comment text -->
 					</div>
 				{/each}
 			{:else}
@@ -122,6 +124,7 @@
 	.rate-form {
 		margin-top: 20px;
 	}
+
 	.b {
 		display: inline-block;
 		padding: 10px 20px;
@@ -135,9 +138,11 @@
 		cursor: pointer;
 		transition: background-color 0.3s ease;
 	}
+
 	.b:hover {
 		background-color: #460706;
 	}
+
 	.b:active {
 		transform: translateY(2px);
 	}
@@ -145,6 +150,7 @@
 	.comments-section {
 		margin-top: 20px;
 	}
+
 	.comment {
 		border: 1px solid #ccc;
 		padding: 10px;

@@ -18,7 +18,7 @@
     </nav>
     <div class="content">
         <div class="sidebar-content">
-            <SidebarEdit />
+        
         </div>
     </div>
     
