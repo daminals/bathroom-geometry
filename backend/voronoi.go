@@ -162,6 +162,13 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints int, size int
 					breakFlag = true
 				}
 			}
+
+			for _, point := range voronoiPoints {
+				if samplePoint.x == point.x && samplePoint.y == point.y {
+					breakFlag = true
+				}
+			}	
+
 			if !breakFlag {
 				samplePoints = append(samplePoints, samplePoint)
 			}
@@ -186,6 +193,13 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints int, size int
 				breakFlag = true
 			}
 		}
+
+		for _, point := range voronoiPoints {
+			if samplePoint.x == point.x && samplePoint.y == point.y {
+				breakFlag = true
+			}
+		}
+
 
 		if !breakFlag {
 			samplePoints = append(samplePoints, samplePoint)
@@ -265,6 +279,7 @@ func calculateNearestVoronoiID(matrix [][]int, voronoiPoints []Point, voronoiTab
 		return -1
 	}
 
+	// check if point is inside voronoi point list
 	for _, voronoiPoint := range top3Voronoi(voronoiPoints, point) {
 		// calculate distance from sample point to voronoi point
 		distance := distance(matrix, point, voronoiPoint)
@@ -354,6 +369,10 @@ func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 		}
 	}
 }
+	// loop through voronoi points and add in the actual voronoi id from the table
+	for _, point := range voronoiPoints {
+		outputMatrix[point.x][point.y] = 0
+	}
 
 	// print out filled points
 	// fmt.Println(filledPointList)
