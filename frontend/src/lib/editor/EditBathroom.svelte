@@ -7,6 +7,7 @@
 </script>
 
 <Card class="max-w-full">
+	<div class="text-sbu font-bold mb-2">Bathroom #{bathroom.id}</div>
 	<Label for="name">Name</Label>
 	<Input type="text" id="name" bind:value={bathroom.name} />
 	<Label for="Gender">Gender</Label>

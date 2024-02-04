@@ -8,7 +8,7 @@ const config = {
 	theme: {
 		extend: {
 			colors: {
-				// flowbite-svelte
+				// SBU
 				primary: {
 					50: "#FFDBDB",
 					100: "#FFB8B8",
@@ -22,7 +22,7 @@ const config = {
 					900: "#1F0000",
 					950: "#0F0000"
 				},
-
+				'sbu': '#990000',
 			}
 		}
 	}

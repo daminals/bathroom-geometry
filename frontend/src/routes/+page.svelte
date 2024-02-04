@@ -11,6 +11,7 @@
         <a href="/">Gallery</a>
         <a href="/edit">Edit</a>
         <a href="/rate">Rate</a>
+        <a href="/viewer">Viewer</a>
     </nav>
     <div class="h-0 flex-grow w-full flex">
         <div class="bg-[#333] text-white w-64">
