@@ -1,7 +1,15 @@
-<script>
+<script lang="ts">
 	// Import the Header, Sidebar, and Gallery components
 	import Header from '../../lib/Header.svelte';
 	import Viewer from '$lib/viewer/Viewer.svelte';
+
+	import { usernameStore } from '$lib/ratingsStore';
+
+    let username: string | null = null;
+
+	usernameStore.subscribe(value => {
+        username = value;
+    });
 </script>
 
 <main class="h-screen w-screen flex flex-col">
@@ -9,11 +17,17 @@
 
 	<Header />
 	<nav>
-		<a href="/">Gallery</a>
-		<a href="/edit">Edit</a>
-		<a href="/rate">Rate</a>
-		<a href="/viewer">Viewer</a>
-	</nav>
+        <a href="/" >Gallery</a>
+        {#if username !== ""}
+            <a href="/logout" >Logout</a>
+            <a href="/editor" >Editor</a>
+			<a href="/viewer" >Viewer</a>
+            <a href="/rate" >Rate</a>
+        {:else}
+            <a href="/login" >Login</a>
+            <a href="/signup" >Sign Up</a>
+        {/if}
+    </nav>
 	<div class="h-0 flex-grow w-full flex">
 		<Viewer />
 	</div>

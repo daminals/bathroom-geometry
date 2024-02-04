@@ -22,15 +22,15 @@ console.log(username)
   
     <Header />
      <nav>
-        <a href="/" class:selectedLink={window.location.pathname === '/'}>Gallery</a>
+        <a href="/" >Gallery</a>
         {#if username !== ""}
-            <a href="/logout" class:selectedLink={window.location.pathname === '/logout'}>Logout</a>
-            <a href="/new" class:selectedLink={window.location.pathname === '/new'}>New</a>
-            <a href="/edit" class:selectedLink={window.location.pathname === '/edit'}>Edit</a>
-            <a href="/rate" class:selectedLink={window.location.pathname === '/rate'}>Rate</a>
+            <a href="/logout" >Logout</a>
+            <a href="/editor" >Editor</a>
+			<a href="/viewer" >Viewer</a>
+            <a href="/rate" >Rate</a>
         {:else}
-            <a href="/login" class:selectedLink={window.location.pathname === '/login'}>Login</a>
-            <a href="/signup" class:selectedLink={window.location.pathname === '/signup'}>Sign Up</a>
+            <a href="/login" >Login</a>
+            <a href="/signup" >Sign Up</a>
         {/if}
     </nav>
     <div style="margin-top: 20px;">
