@@ -1,1 +1,1 @@
-go build main.go && ./main
+go build . && ./bathroom-geometry
