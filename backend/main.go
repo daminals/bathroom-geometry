@@ -269,11 +269,6 @@ type BathroomID struct {
 
 // bathroom map by id handler
 func bathroomGetByIDHandler(w http.ResponseWriter, r *http.Request) {
-	// Only allow get requests
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
 	// Decode JSON request
 	var bathroomID BathroomID
 	decoder := json.NewDecoder(r.Body)
