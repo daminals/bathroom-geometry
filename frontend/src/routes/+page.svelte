@@ -15,15 +15,17 @@
 <main class='h-screen w-screen flex flex-col'>
     <Header />
     <nav>
-        <a href="/" class:selectedLink={window.location.pathname === '/'}>Gallery</a>
-        {#if username !== ""}
-            <a href="/logout" class:selectedLink={window.location.pathname === '/logout'}>Logout</a>
-            <a href="/new" class:selectedLink={window.location.pathname === '/new'}>New</a>
-            <a href="/edit" class:selectedLink={window.location.pathname === '/edit'}>Edit</a>
-            <a href="/rate" class:selectedLink={window.location.pathname === '/rate'}>Rate</a>
+        <a href="/">Gallery</a>
+        {#if username !== null}
+            <!-- If the user is logged in, show logout and other links -->
+            <a href="/logout">Logout</a>
+            <a href="/new">New</a>
+            <a href="/edit">Edit</a>
+            <a href="/rate">Rate</a>
         {:else}
-            <a href="/login" class:selectedLink={window.location.pathname === '/login'}>Login</a>
-            <a href="/signup" class:selectedLink={window.location.pathname === '/signup'}>Sign Up</a>
+            <!-- If the user is not logged in, show login and signup links -->
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
         {/if}
     </nav>
     <div class="h-0 flex-grow w-full flex">
