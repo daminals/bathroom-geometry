@@ -6,8 +6,9 @@
 	export let bathroom: Bathroom;
 </script>
 
-<Card class="max-w-full text-grey-900 text-sm font-medium">
-	<div class="text-sbu font-bold mb-2">Bathroom #{bathroom.id} - {bathroom.name}</div>
+<Card class="text-sbu max-w-full text-grey-900 text-sm font-medium">
+	<div class="font-bold mb-2" style={`color: ${bathroom.color}`
+	}>Bathroom #{bathroom.id} - {bathroom.name}</div>
 	<div>
 		Gender
 	</div>

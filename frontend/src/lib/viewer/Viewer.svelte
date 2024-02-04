@@ -38,8 +38,6 @@
 	function hslToHex(h: number, s: number, l: number) {
 		let r, g, b;
 
-		console.log(h, s, l);
-
 		if (s === 0) {
 			r = g = b = l; // achromatic
 		} else {
@@ -57,7 +55,6 @@
 			r = hue2rgb(p, q, h + 1 / 3);
 			g = hue2rgb(p, q, h);
 			b = hue2rgb(p, q, h - 1 / 3);
-			console.log(r, g, b);
 		}
 
 		// Convert RGB to Hex
@@ -86,7 +83,7 @@
 			bathrooms = new Map();
 			data.bathrooms.forEach((bathroom, index) => {
 				// Assign color to bathroom
-				const color = hslToHex(index / data.bathrooms.length, 0.8, 0.5);
+				const color = hslToHex(index / data.bathrooms.length, 0.8, 0.6);
 				bathrooms.set(bathroom.id, { ...bathroom, color });
 			});
 

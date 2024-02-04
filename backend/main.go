@@ -430,14 +430,38 @@ func handler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
+// enableCORS is a middleware function to enable CORS for all origins
+func enableCORS(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Allow all origins
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		// Allow the necessary methods
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		// Allow the necessary headers
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
+		// Allow credentials if needed
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		// Handle the actual request
+		if r.Method == "OPTIONS" {
+			// Preflight request, respond with 200 OK
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Call the original handler function
+		handler(w, r)
+	}
+}
+
 func main() {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", enableCORS(handler))
 	// Define the endpoint and handler function
-	http.HandleFunc("/api/voronoi", voronoiHandler)
-	http.HandleFunc("/api/bathroom/write", bathroomWriteHandler)
-	http.HandleFunc("/api/bathroom/object/write", bathroomObjectWriteHandler)
-	http.HandleFunc("/api/bathroom/get/id", bathroomGetByIDHandler)
-	http.HandleFunc("/api/bathroom/get/maps", bathroomGetHandler)
+	http.HandleFunc("/api/voronoi", enableCORS(voronoiHandler))
+	http.HandleFunc("/api/bathroom/write", enableCORS(bathroomWriteHandler))
+	http.HandleFunc("/api/bathroom/object/write", enableCORS(bathroomObjectWriteHandler))
+	http.HandleFunc("/api/bathroom/get/id", enableCORS(bathroomGetByIDHandler))
+	http.HandleFunc("/api/bathroom/get/maps", enableCORS(bathroomGetHandler))
 
 	// Specify the directory containing the files
 	dir := "./images/"

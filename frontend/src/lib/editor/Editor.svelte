@@ -4,6 +4,7 @@
 	import EditBathroom from '$lib/editor/EditBathroom.svelte';
 	import { Input, Button } from 'flowbite-svelte';
 	import { SearchOutline } from 'flowbite-svelte-icons';
+	import { PUBLIC_API_ADDRESS } from '$env/static/public';
 
 	let container: HTMLDivElement;
 	let map: google.maps.Map;
@@ -233,7 +234,7 @@
 	}
 
 	// Handle save button click
-	function handleSave() {
+	async function handleSave() {
 		// Convert the data to JSON
 		const data = {
 			name: mapName,
@@ -246,7 +247,13 @@
 		};
 
 		const json = JSON.stringify(data);
-		console.log(json);
+		const res = await fetch(`${PUBLIC_API_ADDRESS}/bathroom/write`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: json
+		});
 	}
 </script>
 
