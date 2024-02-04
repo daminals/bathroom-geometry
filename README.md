@@ -61,3 +61,5 @@ We want to implement a more largescale bathroom finder, that is easily adaptable
 If we had more time, we would have written a Jump Flooding Algorithm with the following customizations, based on a few stack overflow posts (notably [this one](https://stackoverflow.com/questions/73255352/creating-a-voroni-diagram-with-arbitrary-boundaries)):
   - if the tile is colored with the boundary color, discard consideration for recoloring automatically
   - implement A* for the dist() check which respects the walls
+
+Also, in the future, we would like to set up a proper database in the future like MongoDB or SQL. Making community sourced maps more accessible and faster to access as the project scales.  
