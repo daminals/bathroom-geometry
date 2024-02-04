@@ -106,7 +106,7 @@
 		mode = 'Draw';
 		let bounds = rect.getBounds();
 		if (bounds) {
-			// Calculate number of rectangles (5 meters = 1 recentagle)
+			// Calculate number of rectangles (10 meters = 1 recentagle)
 			let distanceX = google.maps.geometry.spherical.computeDistanceBetween(
 				new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
 				new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng())
@@ -115,8 +115,8 @@
 				new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
 				new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getNorthEast().lng())
 			);
-			let xCount = Math.ceil(distanceX / 5);
-			let yCount = Math.ceil(distanceY / 5);
+			let xCount = Math.ceil(distanceX / 10);
+			let yCount = Math.ceil(distanceY / 10);
 
 			// Draw grid within the rectangle
 			const north = bounds.getNorthEast().lat();
