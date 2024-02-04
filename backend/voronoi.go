@@ -53,7 +53,6 @@ func astar(matrix [][]int, start, end Point) ([]Point, int) {
 	for len(openSet) > 0 { 
 		current := heap.Pop(&openSet).(Point)  
 
-
 		//Check if we have reached the end
 		if current == end {  
 			// fmt.Println("Reached?")
@@ -99,7 +98,7 @@ func getNeighbors(point Point, matrix [][]int) []Point {
 		x, y := point.x+move[0], point.y+move[1]
 
 		// Check if the neighbor is within the grid boundaries and is passable
-		if x >= 0 && x < len(matrix) && y >= 0 && y < len(matrix[0]) && matrix[x][y] == 0 {
+		if x >= 0 && x < len(matrix) && y >= 0 && y < len(matrix[0]) && matrix[x][y] != -1 {
 			neighbors = append(neighbors, Point{x, y})
 		}
 	}
@@ -249,7 +248,7 @@ func medianNeighborVornoiID(matrix [][]int, colorMatrix [][]int, point Point) in
 	}
 	// if the most frequent color is the majority, return that color
 	if maxCount > (len(neighbors) / 2 )+1 {	
-		if maxColor != -1 {
+		if maxColor > 0 {
 			return maxColor
 		}
 	}
@@ -280,6 +279,13 @@ func calculateNearestVoronoiID(matrix [][]int, voronoiPoints []Point, voronoiTab
 
 
 func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
+	
+	// create output matrix
+	outputMatrix := make([][]int, size)
+	for i := range outputMatrix {
+		outputMatrix[i] = make([]int, size)
+	}
+	
 	// create initial sample points
 	samplePoints := createInitSamplePoints(voronoiPoints, size*5, size)
 	// fmt.Println(samplePoints)
@@ -290,18 +296,13 @@ func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 	for _, point := range voronoiPoints {
 		filledPointList[filledPoints] = point
 		filledPoints += 1
+		outputMatrix[point.x][point.y] = 0
 	}
 
 	// add sample points to filledPointList
 	for _, point := range samplePoints {
 		filledPointList[filledPoints] = point
 		filledPoints += 1
-	}
-
-	// create output matrix
-	outputMatrix := make([][]int, size)
-	for i := range outputMatrix {
-		outputMatrix[i] = make([]int, size)
 	}
 
 	voronoiTable := createVoronoiTable(voronoiPoints)
@@ -341,6 +342,12 @@ func voronoi(matrix [][]int, voronoiPoints []Point, size int) [][]int {
 				voronoiId := calculateNearestVoronoiID(matrix, voronoiPoints, voronoiTable, checkPoint)
 				// update output matrix with voronoi id
 				outputMatrix[checkPoint.x][checkPoint.y] = voronoiId
+				if (filledPoints == size*size) {
+					fmt.Println("Filled all points")
+					fmt.Println(filledPointList)
+					break;
+				}
+
 				filledPointList[filledPoints] = checkPoint
 				filledPoints += 1
 			}
