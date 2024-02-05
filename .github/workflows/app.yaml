@@ -16,7 +16,7 @@ jobs:
 
       - name: Set up credentials
         run: |
-          echo "env_variables:\n\tFIREBASE_URL: " >> backend/env_variables.yaml
+          echo -n "env_variables:\n  FIREBASE_URL: " >> backend/env_variables.yaml
           echo -n ${{ secrets.GCP_DATABASE_ID }} >> backend/env_variables.yaml
 
       - name: Set up Cloud SDK

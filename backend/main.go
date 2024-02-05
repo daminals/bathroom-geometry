@@ -376,7 +376,7 @@ func main() {
 	// Use a service account
 	config := &firebase.Config{DatabaseURL: firebaseUrl}
 	
-	app, err := firebase.NewApp(ctx, config, opt)
+	app, err := firebase.NewApp(ctx, config, nil)
 	if err != nil {
 		fmt.Println("Error initializing app:", err)
 		return 
