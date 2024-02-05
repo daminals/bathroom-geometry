@@ -1,13 +1,15 @@
 <script lang="ts">
 	// Import the Header, Sidebar, and Gallery components
 	import Header from '../lib/Header.svelte';
+  import InfoBox from '../lib/InfoBox.svelte';
 	import { usernameStore } from '../lib/ratingsStore';
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_ADDRESS } from '$env/static/public';
 	import { Button, Card } from 'flowbite-svelte';
 	import { ArrowRightOutline } from 'flowbite-svelte-icons';
-    import { viewStore } from '$lib/viewStore';
-    import { goto } from '$app/navigation';
+  import { viewStore } from '$lib/viewStore';
+  import { goto } from '$app/navigation';
+  
 
 	let username: string | null = null;
 
@@ -52,25 +54,32 @@
 			<a href="/signup">Sign Up</a>
 		{/if}
 	</nav>
-	<div class="flex w-full flex-grow justify-center flex-col">
-		<div class="h-fit flex gap-4 justify-center">
-			{#each maps as map}
-				<Card class="flex-shrink">
-					<h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-						{map.name}
-					</h5>
-					<p class="mb-3 font-normal leading-tight text-gray-700 dark:text-gray-400">
-						Bathroom map
-					</p>
-					<Button class="w-fit" on:click={() => {
-                        handleView(map.ID)
-                    }}>
-						View <ArrowRightOutline class="ms-2 h-3.5 w-3.5 text-white" />
-					</Button>
-				</Card>
-			{/each}
-		</div>
-	</div>
+  
+  
+  <InfoBox explanation="Welcome to the Bathroom Map Gallery! From this page, you can view any of the predefined maps, and have the option to calculate a voronoi approximation of them. What does this mean? Put simply, we attempt to calculate the closest bathroom from any given point on a map, and then color in all the points which are closest to that bathroom with the same color. If you'd like to create your own map, please log in and go to the editor, where you can build and save your own map of any location!" style="width: 50%;"></InfoBox>
+
+  <div class="flex w-full flex-grow flex-col justify-center">
+    {#each Array.from({ length: Math.ceil(maps.length / 3) }) as _, rowIndex}
+      <div class="h-fit flex gap-4 justify-center">
+        {#each maps.slice(rowIndex * 3, (rowIndex + 1) * 3) as map}
+          <Card class="flex-shrink mb-4">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+              {map.name}
+            </h5>
+            <p class="mb-3 font-normal leading-tight text-gray-700 dark:text-gray-400">
+              Bathroom map
+            </p>
+            <Button class="w-fit" on:click={() => handleView(map.ID)}>
+              View <ArrowRightOutline class="ms-2 h-3.5 w-3.5 text-white" />
+            </Button>
+          </Card>
+        {/each}
+      </div>
+    {/each}
+  </div>
+  
+
+
 </main>
 
 <style>

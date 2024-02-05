@@ -10,10 +10,11 @@ import (
 	"time"
 	"errors"
 
+
 	"context"
 
   firebase "firebase.google.com/go"
-  // "google.golang.org/api/option"
+	"firebase.google.com/go/v4/db"
 )
 
 const bathroomsDB = "bathroomsDB.json"
@@ -348,17 +349,6 @@ func enableCORS(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// func writeToFirebaseDB(data interface{}, path string) error {
-// 	ctx := context.Background()
-
-// 	ref := client.NewRef(path)
-// 	if err := ref.Set(ctx, data); err != nil {
-// 		return fmt.Errorf("error writing data to Firebase: %v", err)
-// 	}
-
-// 	return nil
-// }
-
 func main() {
 	// Define the endpoint and handler function
 
@@ -373,7 +363,7 @@ func main() {
 		log.Fatal("firebase_url environment variable is not set")
 	}
 
-	// Use a service account
+	// Use a connect via gcloud
 	config := &firebase.Config{DatabaseURL: firebaseUrl}
 	
 	app, err := firebase.NewApp(ctx, config)
