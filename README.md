@@ -15,6 +15,32 @@ Using A* and Point Sampling algorithms, the SBU Bathroom Finder enables users to
 
 After either logging in or signing up, users unlock even more features. For example, they have access to the map editor, where they can select a location on Google Maps, insert a grid, and mark all the walls and bathrooms. Upon saving the map, users can press the "compute geometry" button to generate a Voronoi diagram for it. Users can also rate existing restrooms on Stony Brook's campus based on accessibility, cleanliness, and other features. Finally, they can log out when they're finished using the application.
 
+# Demonstration
+
+[![Video Demonstration](https://img.youtube.com/vi/NGmby-4HcmE/0.jpg)](https://www.youtube.com/watch?v=NGmby-4HcmE)
+
+# How to Use
+
+## Running the Backend
+To run the backend, you will need to have Golang installed. You can download it [here](https://golang.org/dl/). Once you have Golang installed, you can run the following commands to start the backend:
+
+```bash
+cd backend
+./run.sh
+```
+
+## Running the Frontend
+To run the frontend, you will need to have Node.js installed. You can download it [here](https://nodejs.org/en/download/). Once you have Node.js installed, you can run the following commands to start the frontend:
+
+```bash
+cd frontend
+npm i
+npm run dev
+```
+
+You will have to create a `.env` file following the `.env.example` file in the frontend directory. This file will contain the Google Maps API key and the backend URL.
+
+
 # How we Built it
 
 ## Backend  
@@ -40,13 +66,9 @@ TypeScript was used to store user information from signing up, logging in, and c
 # Challenges we ran into
 SBU Bathroom Finder was an interesting and tall project for us to tackle as we didn't have much experience in Golang or Svelte and we had never done any pathfinding or projects that required complex distance calculations before. Doing this in 24 hours didn't make it much easier. Implementing our versions of the A* and Point Sampling algorithm was quite difficult as we had no experience coding these before, but eventually, we got an approximation of the Voronoi diagram which is pretty close to what we wanted.  
 
-For reference here's what our code was outputting when we were having difficulties and it broke: 
-![image](https://github.com/daminals/bathroom-geometry/assets/6569519/2fca476a-269c-4ff5-b598-039b537fac1f)
+Here's a graphic showing the massive improvement of our project:
 
-Here's what it was outputting once it was fixed:  
-
-![image](https://github.com/daminals/bathroom-geometry/assets/6569519/75687d71-b802-4ed0-975d-e075c8e968d8)
-
+![image](/assets/improvements.png)
 
 
 # Accomplishments that we're proud of
