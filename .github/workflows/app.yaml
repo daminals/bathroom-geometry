@@ -1,0 +1,33 @@
+name: Deploy to Google App Enginee
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - backend/**
+
+jobs:
+  voronoi-backend-deploy:
+    name: Deploy Backend to App Engine
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Set up Cloud SDK
+        id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: Deploy
+        id: 'deploy'
+        uses: 'google-github-actions/deploy-appengine@v2'
+        with:
+          working_directory: 'backend'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      # Example of using the output
+      - id: 'test'
+        run: 'curl "${{ steps.deploy.outputs.version_url }}"'
+                  
