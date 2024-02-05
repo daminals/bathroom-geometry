@@ -3,7 +3,7 @@ package main
 import (
 	"fmt" 
 	"container/heap"
-	// "sync"
+	"sync"
 	"sort"
 	"math/rand"
 	"math"
@@ -91,7 +91,7 @@ func astar(matrix [][]int, start, end Point) ([]Point, int) {
 			}
 		}
 	}
-	return nil, 0
+	return nil, -1
 }
 
 //Recreates Path when end of algorithm is reached
@@ -194,21 +194,23 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints, sizeX, sizeY
 				continue
 			}
 
-			// check if the sample point is already in the list
-			breakFlag := false
-			for _, point := range samplePoints {
-				if samplePoint.x == point.x && samplePoint.y == point.y {
-					breakFlag = true
-				}
-			}
 
-			for _, point := range voronoiPoints {
-				if samplePoint.x == point.x && samplePoint.y == point.y {
-					breakFlag = true
-				}
-			}	
+			
+			// // check if the sample point is already in the list
+			// breakFlag := false
+			// for _, point := range samplePoints {
+			// 	if samplePoint.x == point.x && samplePoint.y == point.y {
+			// 		breakFlag = true
+			// 	}
+			// }
 
-			if !breakFlag {
+			// for _, point := range voronoiPoints {
+			// 	if samplePoint.x == point.x && samplePoint.y == point.y {
+			// 		breakFlag = true
+			// 	}
+			// }	
+
+			if !(isInArray(samplePoints, samplePoint) || isInArray(voronoiPoints, samplePoint)){
 				samplePoints = append(samplePoints, samplePoint)
 			}
 		}
@@ -226,21 +228,22 @@ func createInitSamplePoints(voronoiPoints []Point, numSamplePoints, sizeX, sizeY
 		}
 
 		// check if the sample point is already in the list
-		breakFlag := false
-		for _, point := range samplePoints {
-			if samplePoint.x == point.x && samplePoint.y == point.y {
-				breakFlag = true
-			}
-		}
+		// breakFlag := false
+		// for _, point := range samplePoints {
+		// 	if samplePoint.x == point.x && samplePoint.y == point.y {
+		// 		breakFlag = true
+		// 	}
+		// }
 
-		for _, point := range voronoiPoints {
-			if samplePoint.x == point.x && samplePoint.y == point.y {
-				breakFlag = true
-			}
-		}
+		// for _, point := range voronoiPoints {
+		// 	if samplePoint.x == point.x && samplePoint.y == point.y {
+		// 		breakFlag = true
+		// 	}
+		// }
 
 
-		if !breakFlag {
+		// if !breakFlag {
+			if !(isInArray(samplePoints, samplePoint) || isInArray(voronoiPoints, samplePoint)){
 			samplePoints = append(samplePoints, samplePoint)
 		}
 	}
@@ -353,6 +356,11 @@ func calculateNearestVoronoiID(matrix, outputMatrix [][]int, voronoiPoints []Poi
 			voronoiId = getVoronoiId(voronoiTable, voronoiPoint)
 		}
 	}
+	// fmt.Println("Voronoi ID: ", voronoiId, "Distance: ", minDistance)
+	if minDistance == -1 {
+		return 0
+	}
+
 	return voronoiId
 }
 
@@ -411,13 +419,7 @@ func Voronoi(matrix [][]int, voronoiPointsWithIds []VoronoiPoint) [][]int {
 		for y := 0; y < sizeY; y += 1 {
 		checkPoint := Point{x, y}
 		// check if the sample point is already in the list
-		breakFlag := false
-		for _, point := range filledPointList {
-			if checkPoint.x == point.x && checkPoint.y == point.y {
-				breakFlag = true
-			}
-		}
-		if !breakFlag {
+		if !(isInArray(filledPointList, checkPoint)) {
 			// print the sample point
 			// fmt.Println(samplePoint)
 
@@ -438,7 +440,6 @@ func Voronoi(matrix [][]int, voronoiPointsWithIds []VoronoiPoint) [][]int {
 					fmt.Println(filledPointList)
 					break;
 				}
-
 				filledPointList[filledPoints] = checkPoint
 				filledPoints += 1
 			}
@@ -446,9 +447,16 @@ func Voronoi(matrix [][]int, voronoiPointsWithIds []VoronoiPoint) [][]int {
 	}
 }
 	// loop through voronoi points and add in the actual voronoi id from the table
-	for _, point := range voronoiPoints {
-		outputMatrix[point.x][point.y] = 0
+	var wg sync.WaitGroup
+	for _, voronoiPointWithId := range voronoiPointsWithIds {
+		wg.Add(1)
+		go func(point Point, id int) {
+			defer wg.Done()
+			outputMatrix[point.x][point.y] = id
+		}(voronoiPointWithId.point, voronoiPointWithId.id)
 	}
+	wg.Wait()
+
 
 	// print out filled points
 	// fmt.Println(filledPointList) 

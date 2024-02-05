@@ -45,10 +45,6 @@ func voronoiHandler(w http.ResponseWriter, r *http.Request) {
 	// create the voronoi output array
 	voronoiOutput := Voronoi(voronoiReq.Matrix, bathroomVoronoi)
 
-	for _, voronoiPoint := range bathroomVoronoi {
-		voronoiOutput[voronoiPoint.point.x][voronoiPoint.point.y] = voronoiPoint.id
-	}
-
 	// create the response
 	jsonResponse, err := json.Marshal(voronoiOutput)
 	if err != nil {
