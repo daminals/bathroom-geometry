@@ -370,7 +370,7 @@ func main() {
 
 	// Check if the url is empty
 	if firebaseUrl == "" {
-		log.Fatal("firebaseurl environment variable is not set")
+		log.Fatal("firebase_url environment variable is not set")
 	}
 
 	// Use a service account
