@@ -5,6 +5,8 @@
 	import { Button, Input } from 'flowbite-svelte';
 	import { PUBLIC_API_ADDRESS } from '$env/static/public';
 
+  import Tooltip from './Tooltip.svelte';
+
 	let container: HTMLDivElement;
 	let map: google.maps.Map;
 	let grid: number[][];
@@ -142,6 +144,11 @@
 		return hexColor.toUpperCase();
 	}
 
+  // Handle tooltip
+  let isTooltipVisible = false;
+  let tooltipText = 'This button will compute a voronoi approximation diagram of the layout, considering walls as barriers, in order to show you the nearest bathroom from any position. Since it is an approximation it may not be 100% accurate.';
+
+
 	// Handle compute geometry
 	type VoronoiResponse = number[][]
 	async function handleCompute() {
@@ -192,8 +199,12 @@
 					<ViewBathroom {bathroom} />
 				{/each}
 			</div>
-			<div class="flex justify-center p-2 gap-2">
+      
+      <div class="relative flex justify-center p-2 gap-2" on:mouseenter={() => isTooltipVisible = true} on:mouseleave={() => isTooltipVisible = false}>
 				<Button on:click={handleCompute}>Compute Geometry</Button>
+          {#if isTooltipVisible}
+            <Tooltip text={tooltipText} />
+          {/if}
 			</div>
 		</div>
 	</div>
