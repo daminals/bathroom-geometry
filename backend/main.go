@@ -13,7 +13,7 @@ import (
 	"context"
 
   firebase "firebase.google.com/go"
-  "google.golang.org/api/option"
+  // "google.golang.org/api/option"
 )
 
 const bathroomsDB = "bathroomsDB.json"
