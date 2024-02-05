@@ -52,7 +52,7 @@ This first led us to the [Jump Flooding Algorithm](https://en.wikipedia.org/wiki
 
 We settled on implementing the Voronoi diagram in an unconventional but more naive approach, taking advantage of A* pathfinding, Distance Heuristics, and some clever splitting of our input into tiles represented by a 2D array.  
 
-With the A* pathfinding algorithm we had to implement our version as many Golang implementations wanted to take in a string representation which would not be compatible with creating Voronoi diagrams. 
+With the A* pathfinding algorithm we had to implement our version as many Golang implementations wanted to take in a string representation which would not be compatible with our input or output to create the Voronoi diagrams. 
 
 Overall, we did end up overcoming most of the challenges we faced in our Backend, though this doesn't mean it's perfect and further optimizations/changes will be mentioned in future sections. So, for now, let's move on to the front-end challenges.
 
