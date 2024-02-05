@@ -20,6 +20,9 @@ jobs:
           echo -n "  FIREBASE_URL: " >> backend/env_variables.yaml
           echo -n ${{ secrets.GCP_DATABASE_ID }} >> backend/env_variables.yaml
 
+      - name: Install dependencies
+        run: gcloud components install app-engine-go
+
       - name: Set up Cloud SDK
         id: 'auth'
         uses: 'google-github-actions/auth@v2'
