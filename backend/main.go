@@ -9,7 +9,11 @@ import (
 	"math/rand"
 	"time"
 	"errors"
-	// "voronoi"
+
+	"context"
+
+  firebase "firebase.google.com/go"
+  "google.golang.org/api/option"
 )
 
 const bathroomsDB = "bathroomsDB.json"
@@ -344,8 +348,53 @@ func enableCORS(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// func writeToFirebaseDB(data interface{}, path string) error {
+// 	ctx := context.Background()
+
+// 	ref := client.NewRef(path)
+// 	if err := ref.Set(ctx, data); err != nil {
+// 		return fmt.Errorf("error writing data to Firebase: %v", err)
+// 	}
+
+// 	return nil
+// }
+
 func main() {
 	// Define the endpoint and handler function
+
+	// Use the application default credentials
+	ctx := context.Background()
+
+	// Retrieve the value of the projectid environment variable
+	firebaseUrl := os.Getenv("FIREBASE_URL")
+
+	// Check if the url is empty
+	if firebaseUrl == "" {
+		log.Fatal("firebaseurl environment variable is not set")
+	}
+
+	// Use a service account
+	config := &firebase.Config{DatabaseURL: firebaseUrl}
+	
+	app, err := firebase.NewApp(ctx, config, opt)
+	if err != nil {
+		fmt.Println("Error initializing app:", err)
+		return 
+	}
+
+	client, err := app.Database(ctx)
+	if err != nil {
+		fmt.Println("Error initializing database client:", err)
+		return
+	}
+
+	ref := client.NewRef("firebase1")
+	if err := ref.Set(ctx, "da2ta"); err != nil {
+		fmt.Println("Error setting value:", err)
+		return
+		// return fmt.Errorf("error writing data to Firebase: %v", err)
+	}
+
 	http.HandleFunc("/api/voronoi", enableCORS(voronoiHandler))
 	http.HandleFunc("/api/bathroom/write", enableCORS(bathroomWriteHandler))
 	http.HandleFunc("/api/bathroom/maps/id", enableCORS(bathroomGetByIDHandler))

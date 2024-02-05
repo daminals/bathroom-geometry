@@ -1,3 +1,4 @@
 backend/main
 backend/voronoi
 backend/bathroom-geometry
+backend/env_variables.yaml
