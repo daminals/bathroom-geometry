@@ -2,8 +2,8 @@
 
 import requests
 
-url = 'http://localhost:8080'
-
+# url = 'http://localhost:8080'
+url = "http://ec2-18-234-246-111.compute-1.amazonaws.com"
 
 def voronoi_test():
     testUrl = url + '/api/voronoi'

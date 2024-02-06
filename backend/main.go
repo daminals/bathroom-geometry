@@ -5,16 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http" 
-	"os"
+	"os" 
 	"math/rand"
 	"time"
 	"errors"
-
-
-	"context"
-
-  firebase "firebase.google.com/go"
-	"firebase.google.com/go/v4/db"
 )
 
 const bathroomsDB = "bathroomsDB.json"
@@ -351,40 +345,6 @@ func enableCORS(handler http.HandlerFunc) http.HandlerFunc {
 
 func main() {
 	// Define the endpoint and handler function
-
-	// Use the application default credentials
-	ctx := context.Background()
-
-	// Retrieve the value of the projectid environment variable
-	firebaseUrl := os.Getenv("FIREBASE_URL")
-
-	// Check if the url is empty
-	if firebaseUrl == "" {
-		log.Fatal("firebase_url environment variable is not set")
-	}
-
-	// Use a connect via gcloud
-	config := &firebase.Config{DatabaseURL: firebaseUrl}
-	
-	app, err := firebase.NewApp(ctx, config)
-	if err != nil {
-		fmt.Println("Error initializing app:", err)
-		return 
-	}
-
-	client, err := app.Database(ctx)
-	if err != nil {
-		fmt.Println("Error initializing database client:", err)
-		return
-	}
-
-	ref := client.NewRef("firebase1")
-	if err := ref.Set(ctx, "da2ta"); err != nil {
-		fmt.Println("Error setting value:", err)
-		return
-		// return fmt.Errorf("error writing data to Firebase: %v", err)
-	}
-
 	http.HandleFunc("/api/voronoi", enableCORS(voronoiHandler))
 	http.HandleFunc("/api/bathroom/write", enableCORS(bathroomWriteHandler))
 	http.HandleFunc("/api/bathroom/maps/id", enableCORS(bathroomGetByIDHandler))
