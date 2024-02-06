@@ -17,6 +17,10 @@ After either logging in or signing up, users unlock even more features. For exam
 
 # Demonstration
 
+Our project is live [here!](http://ec2-18-234-246-111.compute-1.amazonaws.com).
+
+If you'd like to see a curated walk though of our key features, click the video below:
+
 [![Video Demonstration](https://img.youtube.com/vi/NGmby-4HcmE/0.jpg)](https://www.youtube.com/watch?v=NGmby-4HcmE)
 
 # How to Use
