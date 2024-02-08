@@ -153,6 +153,12 @@
 					rectangle.addListener('click', () => {
 						handleRectClick(j, i);
 					});
+
+          // rectangle.addListener('drag', () => {
+          //   console.log('dragging');
+					// 	handleRectDrag(j, i);
+					// });
+
 					rectangles.push(rectangle);
 				}
 			}
@@ -233,6 +239,18 @@
 			grid[y][x] = -1;
 		}
 	}
+
+  // Handle drag event
+  function handleDrag(event: MouseEvent) {
+    if (mode === 'Add' && event.buttons === 1) {
+      const target = event.target as HTMLElement;
+      const rectIndex = target.dataset.rectIndex;
+      if (rectIndex) {
+        const [x, y] = rectIndex.split(',').map(Number);
+        handleRectClick(x, y);
+      }
+    }
+  }
 
 	// Handle save button click
 	async function handleSave() {

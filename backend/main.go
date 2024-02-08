@@ -163,6 +163,15 @@ func writeBathroomMapToFile(bathroomMap BathroomMapOutput) error {
 	// Append the new bathroomMap to the JSON
 	bathroomMaps = append(bathroomMaps, bathroomMap)
 
+	// // Remove entries older than 5 minutes
+	// currentTime := time.Now()
+	// var updatedBathroomMaps []BathroomMapOutput
+	// for _, bm := range bathroomMaps {
+	// 	if currentTime.Sub(bm.CreatedAt) <= 5*time.Minute {
+	// 		updatedBathroomMaps = append(updatedBathroomMaps, bm)
+	// 	}
+	// }
+
 	// Convert the bathroomMaps to JSON
 	jsonData, err := json.Marshal(bathroomMaps)
 	if err != nil {
