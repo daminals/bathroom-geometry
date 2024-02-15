@@ -265,7 +265,7 @@
 			bathrooms: Array.from(bathrooms.values())
 		};
 
-		const json = JSON.stringify(data);
+		const json = JSON.stringify(data); 
 		const res = await fetch(`${PUBLIC_API_ADDRESS}/bathroom/write`, {
 			method: 'POST',
 			headers: {
