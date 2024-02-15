@@ -24,9 +24,9 @@
 	<nav>
 		<a href="/">Gallery</a>
 		<a href="/viewer">Viewer</a>
+    <a href="/editor">Editor</a>
 		{#if username !== ''}
 			<a href="/logout">Logout</a>
-			<a href="/editor">Editor</a>
 			<a href="/rate">Rate</a>
 		{:else}
 			<a href="/login">Login</a>
