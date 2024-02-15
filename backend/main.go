@@ -1,14 +1,14 @@
-package main 
+package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
-	"net/http" 
-	"os" 
 	"math/rand"
+	"net/http"
+	"os"
 	"time"
-	"errors"
 )
 
 const bathroomsDB = "bathroomsDB.json"
@@ -73,18 +73,20 @@ type Coordinates struct {
 
 // BathroomMap represents the main structure for unmarshaling the JSON.
 type BathroomMap struct {
-	Name        string       `json:"name"`
+	Name        string        `json:"name"`
 	Coordinates []Coordinates `json:"coordinates"`
 	Grid        [][]int       `json:"grid"`
-	Bathrooms   []Bathroom    `json:"bathrooms"` 
+	Bathrooms   []Bathroom    `json:"bathrooms"`
 }
 
 type BathroomMapOutput struct {
-	Name        string       `json:"name"`
+	Name        string        `json:"name"`
 	Coordinates []Coordinates `json:"coordinates"`
 	Grid        [][]int       `json:"grid"`
-	Bathrooms   []Bathroom    `json:"bathrooms"` 
-	ID 					int 					`json:"ID"`
+	Bathrooms   []Bathroom    `json:"bathrooms"`
+	ID          int           `json:"ID"`
+	Time        time.Time     `json:"time"`
+	Delete      bool          `json:"delete"`
 }
 
 func generateUniqueID() int {
@@ -99,13 +101,25 @@ func generateUniqueID() int {
 
 func ConvertBathroomMapToOutput(bathroomMap BathroomMap) BathroomMapOutput {
 	bathroomMapOutput := BathroomMapOutput{
-		Name: bathroomMap.Name,
-		ID: generateUniqueID(),
+		Name:        bathroomMap.Name,
+		ID:          generateUniqueID(),
+		Time:        time.Now(),
+		Delete:      true,
 		Coordinates: bathroomMap.Coordinates,
-		Grid: bathroomMap.Grid,
-		Bathrooms: bathroomMap.Bathrooms,
+		Grid:        bathroomMap.Grid,
+		Bathrooms:   bathroomMap.Bathrooms,
 	}
 	return bathroomMapOutput
+}
+
+// check if more than one hour ago
+func isMoreThanOneHourAgo(t time.Time) bool {
+	return time.Now().Sub(t) > time.Hour
+}
+
+// check if more than one minute ago
+func isMoreThanOneMinuteAgo(t time.Time) bool {
+	return time.Now().Sub(t) > time.Minute
 }
 
 func bathroomWriteHandler(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +150,7 @@ func bathroomWriteHandler(w http.ResponseWriter, r *http.Request) {
 	jsonResponse, err := json.Marshal(bathroomMapOutput)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return 
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -152,11 +166,15 @@ func writeBathroomMapToFile(bathroomMap BathroomMapOutput) error {
 		fmt.Println("Error:", err)
 		return err
 	}
+	// add time and delete to the bathroomMap
+	bathroomMap.Time = time.Now()
+	bathroomMap.Delete = true
+
 	// Unmarshal the JSON data into a slice of BathroomMap objects
 	var bathroomMaps []BathroomMapOutput
 	err = json.Unmarshal(file, &bathroomMaps)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("Error Unmarshal JSON Write to File:", err)
 		return err
 	}
 
@@ -210,48 +228,71 @@ func writeBathroomMapToFile(bathroomMap BathroomMapOutput) error {
 
 type BathroomGet struct {
 	Name string `json:"name"`
-	ID int `json:"ID"`
+	ID   int    `json:"ID"`
 }
-//Converts BathroomMapOutput to BathroomGet
+
+// Converts BathroomMapOutput to BathroomGet
 func ConvertOutputToGet(bathroomMap BathroomMapOutput) BathroomGet {
-    bathroomGet := BathroomGet{
-        Name: bathroomMap.Name,
-        ID: bathroomMap.ID,
-    }
-    return bathroomGet
+	bathroomGet := BathroomGet{
+		Name: bathroomMap.Name,
+		ID:   bathroomMap.ID,
+	}
+	return bathroomGet
 }
+
 // Get BathroomMaps from the file
 func getBathroomMapsFromFile() ([]BathroomGet, error) {
-    // Read existing data from file
-    file, err := os.ReadFile(bathroomsDB)
-    if err != nil {
-        fmt.Println("Error:", err)
-        return nil, err
-    }
-    // Unmarshal the JSON data into a slice of BathroomMap objects
-    var bathroomOutputs []BathroomMapOutput
-    err = json.Unmarshal(file, &bathroomOutputs)
-    if err != nil {
-        fmt.Println("Error:", err)
-        return nil, err
-    }
-    // transform the data into an array of BathroomGet Structs   
-    var bathroomGets [] BathroomGet 
-    for _, maps := range bathroomOutputs{ 
-        bathroomGets = append(bathroomGets, ConvertOutputToGet(maps))
-    } 
-    return bathroomGets, err; 
+	// Read existing data from file
+	file, err := os.ReadFile(bathroomsDB)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil, err
+	}
+	// Unmarshal the JSON data into a slice of BathroomMap objects
+	var bathroomOutputs []BathroomMapOutput
+	err = json.Unmarshal(file, &bathroomOutputs)
+	if err != nil {
+		fmt.Println("Error Unmarshal JSON get Map:", err)
+		return nil, err
+	}
+
+	// transform the data into an array of BathroomGet Structs
+	var bathroomGets []BathroomGet
+	var updatedBathroomOutputs []BathroomMapOutput
+	for _, maps := range bathroomOutputs {
+		// fmt.Println(maps)
+		// fmt.Println(maps.time)
+		// fmt.Println(maps.delete)
+
+		// check if the bathroom is more than one hour old and delete is true
+		if isMoreThanOneHourAgo(maps.Time) && maps.Delete {
+			continue
+		}
+		updatedBathroomOutputs = append(updatedBathroomOutputs, maps)
+		bathroomGets = append(bathroomGets, ConvertOutputToGet(maps))
+	}
+
+	// update the file with the new data
+	jsonData, err := json.MarshalIndent(updatedBathroomOutputs, "", " ")
+	if err != nil {
+		fmt.Println("Error Writing Back to JSON:", err)
+		return nil, err
+	}
+	err = os.WriteFile(bathroomsDB, jsonData, 0644)
+
+	return bathroomGets, err
 }
-//bathroom maps by both name and ID 
-func bathroomGetHandler(w http.ResponseWriter, r *http.Request){ 
-	//Allow only request 
-	if r.Method != http.MethodGet { 
+
+// bathroom maps by both name and ID
+func bathroomGetHandler(w http.ResponseWriter, r *http.Request) {
+	//Allow only request
+	if r.Method != http.MethodGet {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
-	} 
+	}
 
 	bathroomMaps, err := getBathroomMapsFromFile()
-	if err!= nil { 
+	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -259,13 +300,13 @@ func bathroomGetHandler(w http.ResponseWriter, r *http.Request){
 	jsonResponse, err := json.Marshal(bathroomMaps)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return 
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResponse)
-} 
+}
 
 type BathroomID struct {
 	ID int `json:"ID"`
@@ -292,7 +333,7 @@ func bathroomGetByIDHandler(w http.ResponseWriter, r *http.Request) {
 	jsonResponse, err := json.Marshal(bathroomMap)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return 
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -323,10 +364,9 @@ func getBathroomMapsByID(id int) (BathroomMapOutput, error) {
 			return bathroomMap, nil
 		}
 	}
-	
+
 	return BathroomMapOutput{}, errors.New("BathroomMap not found")
 }
-
 
 // enableCORS is a middleware function to enable CORS for all origins
 func enableCORS(handler http.HandlerFunc) http.HandlerFunc {
@@ -354,6 +394,9 @@ func enableCORS(handler http.HandlerFunc) http.HandlerFunc {
 
 func main() {
 	// Define the endpoint and handler function
+	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	// 	fmt.Fprint(w, "Welcome to the bathroom finder API!")
+	// })
 	http.HandleFunc("/api/voronoi", enableCORS(voronoiHandler))
 	http.HandleFunc("/api/bathroom/write", enableCORS(bathroomWriteHandler))
 	http.HandleFunc("/api/bathroom/maps/id", enableCORS(bathroomGetByIDHandler))

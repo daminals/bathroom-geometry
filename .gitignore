@@ -5,3 +5,5 @@ backend/env_variables.yaml
 bathroom-voronoi-ec2.pem
 frontend/push_to_ec2.sh
 backend/restore.sh
+backend/ssl
+bathroom-voronoi-oci.key
